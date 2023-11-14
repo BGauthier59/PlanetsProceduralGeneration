@@ -156,8 +156,8 @@ public class PlanetGeneration : MonoBehaviour
         Vector3 a, b, c;
         foreach (var tri in triangles)
         {
-            //tri.heightLevel = RandomGenerator.GetRandomValueInt(0, 2);
-            tri.heightLevel = 1;
+            tri.heightLevel = RandomGenerator.GetRandomValueInt(0, 3);
+            //tri.heightLevel = 1;
             int indexA, indexB, indexC;
             indexA = indexB = indexC = -1;
 
