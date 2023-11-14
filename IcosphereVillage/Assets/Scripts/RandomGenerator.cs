@@ -16,4 +16,14 @@ public class RandomGenerator : MonoBehaviour
         seed = calculated;
         return calculated / (float)modulo;
     }
+
+    public static int GetRandomValueInt(int min, int max)
+    {
+        return (int)GetRandomValueInRange(min, max);
+    }
+
+    public static float GetRandomValueInRange(float min, float max)
+    {
+        return (min + GetRandomValue() * (max - min));
+    }
 }
