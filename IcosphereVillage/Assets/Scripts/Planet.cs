@@ -204,8 +204,8 @@ public class Planet : MonoBehaviour
         SetOrganicDisplacement();
 
         CreateTreesAndRocks();
-        SetHangar();
-        CreateFirstExplorers();
+        SetHangar(out int hangarIndex);
+        CreateFirstExplorers(hangarIndex);
 
         CreateAllRectangles();
 
@@ -232,7 +232,6 @@ public class Planet : MonoBehaviour
     void SetElevationGrouped()
     {
         Vector3 triPos;
-        bool first = true;
 
         foreach (var tri in triangles)
         {
@@ -240,12 +239,8 @@ public class Planet : MonoBehaviour
             triPos *= noiseSize;
             float v = (elevationNoise.Evaluate(triPos) + 1) * 0.5f;
 
-            if (first)
-            {
-                first = false;
-                tri.heightLevel = waterLevel;
-            }
-            else tri.heightLevel = (int)(v * (maxHeight + 1));
+            
+            tri.heightLevel = (int)(v * (maxHeight + 1));
             
             for (int i = 0; i < tri.heightLevel; i++)
             {
@@ -831,17 +826,36 @@ public class Planet : MonoBehaviour
         }
     }
 
-    void SetHangar()
+    void SetHangar(out int hangarIndex)
     {
-        Triangle triangle = triangles[0];
+        hangarIndex = 0;
+        Triangle triangle = null;
+        for (int i = 0; i < triangles.Count; i++)
+        {
+            if (triangles[i].heightLevel >= waterLevel && triangles[triangles[i].neighbourA].heightLevel == triangles[i].heightLevel
+                                                       && triangles[triangles[i].neighbourB].heightLevel == triangles[i].heightLevel
+                                                       && triangles[triangles[i].neighbourC].heightLevel == triangles[i].heightLevel)
+            {
+                triangle = triangles[i];
+                hangarIndex = i;
+                break;
+            }
+        }
+
+        if (triangle == null)
+        {
+            triangle = triangles[0];
+        }
+        
         hangar.localPosition = triangle.centralPoint + triangle.normal * triangle.heightLevel * heightSize;
         hangar.localRotation = Quaternion.LookRotation(triangle.normal);
+        
     }
 
-    void CreateFirstExplorers()
+    void CreateFirstExplorers(int tri)
     {
-        explorer1.Initialize(this, 0);
-        explorer2.Initialize(this, 0);
+        explorer1.Initialize(this, triangles[tri].neighbourA);
+        explorer2.Initialize(this, triangles[tri].neighbourB);
     }
 
     #endregion
