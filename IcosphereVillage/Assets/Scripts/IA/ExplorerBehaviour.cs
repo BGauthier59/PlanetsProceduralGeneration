@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +15,7 @@ public class ExplorerBehaviour : MonoBehaviour
     [SerializeField] private float jumpDuration = 0.1f;
     [SerializeField] private int locationIndex;
     [SerializeField] private int DEBUG_Target;
-    
+    [SerializeField] private SpriteRenderer icon;
     public void Initialize(Planet home, int index)
     {
         this.home = home;
@@ -169,5 +170,11 @@ public class ExplorerBehaviour : MonoBehaviour
         Triangle triangle = home.triangles[index];
         int[] neighbours = new[] { triangle.neighbourA, triangle.neighbourB, triangle.neighbourC };
         return neighbours;
+    }
+
+
+    private void Update()
+    {
+        icon.transform.rotation = Quaternion.Euler(0,0,0);
     }
 }

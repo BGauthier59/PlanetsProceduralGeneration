@@ -855,7 +855,7 @@ MonoBehaviour:
   allPlanets: []
   planetPrefab: {fileID: 3254101452558638239, guid: c15a4d7057260e44199931fe0876fedb,
     type: 3}
-  seed: 45653
+  globalSeed: 452
 --- !u!4 &1093796947
 Transform:
   m_ObjectHideFlags: 0
