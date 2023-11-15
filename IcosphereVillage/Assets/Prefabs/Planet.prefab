@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 3493664345625477101}
   - component: {fileID: 5481901173523360710}
   m_Layer: 0
-  m_Name: Sphere
+  m_Name: WaterSphere
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -83,6 +83,37 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &2300671878983183884
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5417725066891541343}
+  m_Layer: 0
+  m_Name: TreeParent
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5417725066891541343
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2300671878983183884}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 9042101294885135624}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4959502637196766137
 GameObject:
   m_ObjectHideFlags: 0
@@ -116,6 +147,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4190450064442439710}
+  - {fileID: 5417725066891541343}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &2430389131594545572
@@ -146,7 +178,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: cd7612ea7cafc0f428f5a3263a5058d6, type: 2}
+  - {fileID: 2100000, guid: 369adf5e1154d4b4f8154b4279d72485, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -186,11 +218,29 @@ MonoBehaviour:
   subdividedTris: []
   rects: []
   filter: {fileID: 2430389131594545572}
+  planetRenderer: {fileID: 8397276476116871114}
+  waterRenderer: {fileID: 5481901173523360710}
+  stratsMats:
+  - {fileID: 2100000, guid: 369adf5e1154d4b4f8154b4279d72485, type: 2}
+  - {fileID: 2100000, guid: 10c6e13fd7d13264291e78c6795cdf7a, type: 2}
+  - {fileID: 2100000, guid: 4cd0a074860843f4eb57d4cec27de4e5, type: 2}
+  - {fileID: 2100000, guid: c680b2ba9f9319444af06930372fe4ac, type: 2}
+  - {fileID: 2100000, guid: 7fd6f1fd8fd9ec5479e3bd367c16ddeb, type: 2}
+  - {fileID: 2100000, guid: bd1360e476c952343921af0ea13f76dd, type: 2}
+  - {fileID: 2100000, guid: ee78862cf437a7e4ca1369c7b0b5beae, type: 2}
+  waterMats:
+  - {fileID: 2100000, guid: 6d4eaef20b799a9469e3d8bae1e57049, type: 2}
+  - {fileID: 2100000, guid: c145928709a1a9e43a4f30bd7975df85, type: 2}
+  tree: {fileID: 222292335441431702, guid: 44a0a12a18f3d534da87600e9f20aae8, type: 3}
+  treeParent: {fileID: 5417725066891541343}
   size: 3
   heightSize: 0.3
   elevationScaleFactor: 0.75
-  subdivisions: 2
-  maxHeight: 3
-  seed: 5
+  subdivisions: 3
+  maxHeight: 4
+  seed: 92600
   noiseSize: 0.3
+  forestNoiseSize: 0.5
+  waterLevel: 0
   waterSphere: {fileID: 4190450064442439710}
+  vertexColors: []

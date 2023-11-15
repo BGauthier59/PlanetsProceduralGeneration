@@ -20,7 +20,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: M_VertexColor
+  m_Name: M_Strats_1
   m_Shader: {fileID: -6465566751694194690, guid: a4f25be688be83b478b3990e78c697c2,
     type: 3}
   m_Parent: {fileID: 0}
@@ -51,7 +51,13 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _GroundLevel: 2
     - _QueueControl: 0
     - _QueueOffset: 0
-    m_Colors: []
+    - _heightMax: 4
+    - _strat: 2
+    m_Colors:
+    - _BottomColor: {r: 0.26415092, g: 0.26415092, b: 0.26415092, a: 0}
+    - _GroundColor: {r: 0.671973, g: 1, b: 0.10849059, a: 0}
+    - _TopColor: {r: 0.21168566, g: 0.6320754, b: 0.28038844, a: 0}
   m_BuildTextureStacks: []
