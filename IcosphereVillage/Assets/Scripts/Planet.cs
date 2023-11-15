@@ -24,7 +24,7 @@ public class Planet : MonoBehaviour
 
     public GameObject tree;
     public Transform treeParent;
-    
+
     public float size;
     public float heightSize, elevationScaleFactor;
     public int subdivisions;
@@ -35,7 +35,7 @@ public class Planet : MonoBehaviour
     public float forestNoiseSize;
 
     public int waterLevel;
-    
+
     [SerializeField] private Transform waterSphere;
 
     public Noise elevationNoise;
@@ -44,6 +44,9 @@ public class Planet : MonoBehaviour
     public Dictionary<(int, int), int> midPointsDic = new Dictionary<(int, int), int>();
 
     public List<Color> vertexColors = new List<Color>();
+
+    [SerializeField] private Transform hangar;
+    [SerializeField] private ExplorerBehaviour explorer1, explorer2;
 
     private void OnValidate()
     {
@@ -62,7 +65,7 @@ public class Planet : MonoBehaviour
             if (tri.neighbourC != -1)
                 Debug.DrawLine(tri.centralPoint, subdividedTris[tri.neighbourC].centralPoint, Color.blue);
         }
-        
+
 
         for (int i = 0; i < gridVertices.Count; i++)
         {
@@ -72,31 +75,30 @@ public class Planet : MonoBehaviour
             }
         }
         */
-
     }
 
     public async void Initialize()
     {
         seed = RandomGenerator.GetRandomSeed();
-        
+
         elevationNoise = new Noise((int)seed);
-        forestNoise = new Noise((int)seed+1);
+        forestNoise = new Noise((int)seed + 1);
 
         RandomGenerator.SetSeed(seed);
 
         // MAX HEIGHT DE 2 A 5
         maxHeight = RandomGenerator.GetRandomValueInt(2, 6);
-        
+
         // WATER LEVEL DE 0 ( pas d'eau ) A MAX HEIGHT - 1 ( 2 niveaux de ground minimum )
         waterLevel = RandomGenerator.GetRandomValueInt(0, maxHeight);
-        waterSphere.localScale = Vector3.one * (size * 2 + heightSize * (waterLevel * 2 -0.5f));
+        waterSphere.localScale = Vector3.one * (size * 2 + heightSize * (waterLevel * 2 - 0.5f));
 
         planetRenderer.material = new Material(stratsMats[RandomGenerator.GetRandomValueInt(0, stratsMats.Length)]);
-        planetRenderer.material.SetFloat("_heightMax",maxHeight);
-        planetRenderer.material.SetFloat("_GroundLevel",waterLevel);
-        
+        planetRenderer.material.SetFloat("_heightMax", maxHeight);
+        planetRenderer.material.SetFloat("_GroundLevel", waterLevel);
+
         waterRenderer.material = waterMats[RandomGenerator.GetRandomValueInt(0, waterMats.Length)];
-        
+
         filter.mesh = null;
 
         float t = (1 + Mathf.Sqrt(5)) / 2;
@@ -193,49 +195,51 @@ public class Planet : MonoBehaviour
         }
 
         Debug.Log(vertices.Count);
-        
+
         SetElevationGrouped();
         SetOrganicDisplacement();
 
         CreateTreesAndRocks();
-        
+        SetHangar();
+        CreateFirstExplorers();
+
         CreateAllRectangles();
-        
+
         Mesh mesh = new Mesh();
 
         for (int i = 0; i < vertices.Count; i++)
         {
-            vertexColors.Add(new Color());   
+            vertexColors.Add(new Color());
         }
 
         int[] tris = GetTriangleIndexesArray(triangles.ToArray());
         mesh.vertices = vertices.ToArray();
         mesh.triangles = tris;
         mesh.colors = vertexColors.ToArray();
-        
+
         mesh.RecalculateNormals();
         filter.mesh = mesh;
-        
     }
 
-
-
-    #region 2eme Cercle de l'enfer [ Algo par groupes ]
+    #region Elevation
 
     void SetElevationGrouped()
     {
         Vector3 triPos;
+        bool first = true;
+
         foreach (var tri in triangles)
         {
-            //tri.heightLevel = RandomGenerator.GetRandomValueInt(0, 2) * 2;
-            //tri.heightLevel = RandomGenerator.GetRandomValueInt(0, maxHeight + 1);
-            //tri.heightLevel = maxHeight;
-            
             triPos = tri.centralPoint;
             triPos *= noiseSize;
             float v = (elevationNoise.Evaluate(triPos) + 1) * 0.5f;
 
-            tri.heightLevel = (int) (v * (maxHeight + 1));
+            if (first)
+            {
+                first = false;
+                tri.heightLevel = waterLevel;
+            }
+            else tri.heightLevel = (int)(v * (maxHeight + 1));
 
             for (int i = 0; i < tri.heightLevel; i++)
             {
@@ -243,9 +247,7 @@ public class Planet : MonoBehaviour
             }
         }
 
-
         // REFAIRE CA POUR CHAQUE NIVEAU D'ELEVATION
-
         for (int h = 0; h < maxHeight; h++)
         {
             int heightLevel = h + 1;
@@ -264,36 +266,39 @@ public class Planet : MonoBehaviour
                     {
                         // CALCULE LE GROUPE DE VOISINS DE MEME HAUTEUR
                         List<int> group = new List<int>();
-                        FormElevationGroup(gridVertex.triangles.ToArray(), j, heightLevel,ref group);
-                    
+                        FormElevationGroup(gridVertex.triangles.ToArray(), j, heightLevel, ref group);
+
                         Vector3 midPoint = Vector3.zero;
 
                         for (int k = 0; k < group.Count; k++)
                         {
                             // RENSEIGNE LES TRIANGLES VISITES
                             alreadyVisited.Add(group[k]);
-                        
+
                             // CALCULE LE POINT D'ELEVATION
-                            Vector3 heightPoint = (triangles[gridVertex.triangles[group[k]]].centralPoint + (vertices[i] - triangles[gridVertex.triangles[group[k]]].centralPoint) * elevationScaleFactor)+
-                                                  triangles[gridVertex.triangles[group[k]]].normal * heightSize *
-                                                  heightLevel;
-                        
+                            Vector3 heightPoint =
+                                (triangles[gridVertex.triangles[group[k]]].centralPoint +
+                                 (vertices[i] - triangles[gridVertex.triangles[group[k]]].centralPoint) *
+                                 elevationScaleFactor) +
+                                triangles[gridVertex.triangles[group[k]]].normal * heightSize *
+                                heightLevel;
+
                             // L'AJOUTE A LA MOYENNE
                             midPoint += heightPoint;
                         }
-                    
+
                         // FAIS LA MOYENNE DES POINTS DU GROUPE
                         midPoint /= group.Count;
-                    
+
                         // AJOUTE LE MID POINT AUX VERTICES
                         vertices.Add(midPoint);
-                    
+
                         // POUR TOUS LES TRIANGLES DU GROUPE...
                         for (int k = 0; k < group.Count; k++)
                         {
                             Vector3Int v = triangles[gridVertex.triangles[group[k]]].elevationTriangle[heightLevel - 1];
                             int vertIndex = 0;
-                        
+
                             for (int l = 0; l < 3; l++)
                             {
                                 if (triangles[gridVertex.triangles[group[k]]].indices[l] == i)
@@ -302,7 +307,7 @@ public class Planet : MonoBehaviour
                                     break;
                                 }
                             }
-                        
+
                             // ... ON SET L'INDEX DU POINT D'ELEVATION ( mid Point calculé précédemment )
                             switch (vertIndex)
                             {
@@ -319,19 +324,16 @@ public class Planet : MonoBehaviour
 
                             triangles[gridVertex.triangles[group[k]]].elevationTriangle[heightLevel - 1] = v;
                         }
-
                     }
                 }
-            } 
+            }
         }
-        
-        
     }
 
-    void FormElevationGroup(int[] vertexTris, int origin,int heightLvl, ref List<int> group)
+    void FormElevationGroup(int[] vertexTris, int origin, int heightLvl, ref List<int> group)
     {
         group.Add(origin);
-        
+
         // SI LE GROUPE CONTIENT DEJA 6 TRIANGLES ( maximum ) ON STOP
         if (group.Count >= 6) return;
 
@@ -339,7 +341,7 @@ public class Planet : MonoBehaviour
         for (int nIndex = 0; nIndex < 3; nIndex++)
         {
             int neighbour = -1;
-            
+
             switch (nIndex)
             {
                 case 0:
@@ -352,7 +354,7 @@ public class Planet : MonoBehaviour
                     neighbour = triangles[vertexTris[origin]].neighbourC;
                     break;
             }
-            
+
             // SI VOISIN DE ORIGIN EST PRESENT DANS L'ARRAY DE TRIANGLES FOURNI
             for (int testedIndex = 0; testedIndex < vertexTris.Length; testedIndex++)
             {
@@ -362,8 +364,9 @@ public class Planet : MonoBehaviour
                     if (triangles[neighbour].heightLevel >= heightLvl && !group.Contains(testedIndex))
                     {
                         // ALORS LE VOISIN EST AJOUTE AU GROUPE ET VA LUI AUSSI CHECKER CES VOISINS
-                        FormElevationGroup(vertexTris,testedIndex,heightLvl,ref group);
+                        FormElevationGroup(vertexTris, testedIndex, heightLvl, ref group);
                     }
+
                     break;
                 }
             }
@@ -372,7 +375,7 @@ public class Planet : MonoBehaviour
 
     #endregion
 
-    #region 3eme Cercle de l'enfer ( L'enfer des reliaisons )
+    #region Pentes
 
     void CreateAllRectangles()
     {
@@ -395,16 +398,15 @@ public class Planet : MonoBehaviour
                         neighbour = triangles[triangles[i].neighbourC];
                         break;
                 }
-                
+
                 // SI TRIANGLE PLUS HAUT QUE NEIGHBOUR
                 if (triangles[i].heightLevel > neighbour.heightLevel)
                 {
-                    
                     // CHERCHER LES VERTEX COMMUNS AVEC NEIGHBOUR
                     int vert1i = -1;
                     int vert2i = -1;
-                    
-                    
+
+
                     // POUR CHAQUE VERTEX DU TRIANGLE
                     for (int k = 0; k < 3; k++)
                     {
@@ -417,10 +419,10 @@ public class Planet : MonoBehaviour
                             }
                         }
                     }
-                    
+
                     // CA C'EST UN ECHANGE DE VARIABLE ( niveau CP )
                     if (vert1i == 0 && vert2i == 2) (vert1i, vert2i) = (vert2i, vert1i);
-                    
+
                     for (int h = triangles[i].heightLevel - 1; h >= neighbour.heightLevel; h--)
                     {
                         int a = vert1i switch
@@ -437,40 +439,38 @@ public class Planet : MonoBehaviour
                         };
                         int c;
                         int d;
-                        
+
                         if (h == 0)
                         {
-
                             c = triangles[i].indices[vert1i];
                             d = triangles[i].indices[vert2i];
                         }
                         else
                         {
-                           
                             c = vert1i switch
                             {
-                                0 => triangles[i].elevationTriangle[h-1].x,
-                                1 => triangles[i].elevationTriangle[h-1].y,
-                                2 => triangles[i].elevationTriangle[h-1].z,
+                                0 => triangles[i].elevationTriangle[h - 1].x,
+                                1 => triangles[i].elevationTriangle[h - 1].y,
+                                2 => triangles[i].elevationTriangle[h - 1].z,
                             };
                             d = vert2i switch
                             {
-                                0 => triangles[i].elevationTriangle[h-1].x,
-                                1 => triangles[i].elevationTriangle[h-1].y,
-                                2 => triangles[i].elevationTriangle[h-1].z,
+                                0 => triangles[i].elevationTriangle[h - 1].x,
+                                1 => triangles[i].elevationTriangle[h - 1].y,
+                                2 => triangles[i].elevationTriangle[h - 1].z,
                             };
                         }
-                        
-                        CreateRect(a,b,c,d,h+1);
+
+                        CreateRect(a, b, c, d, h + 1);
                     }
                 }
             }
         }
-        
+
         //CreateRect();
     }
 
-    void CreateRect(int a,int b,int c,int d,int elevation)
+    void CreateRect(int a, int b, int c, int d, int elevation)
     {
         Rectangle rect = new Rectangle();
         rect.a = a;
@@ -482,10 +482,44 @@ public class Planet : MonoBehaviour
     }
 
     #endregion
-    
-    
+
+    #region Organic Displacement
+
     private void SetOrganicDisplacement()
     {
+    }
+
+    #endregion
+
+    #region Construction
+
+    void AddVertex(float x, float y, float z)
+    {
+        vertices.Add(new Vector3(x, y, z));
+        gridVertices.Add(new Vertex());
+    }
+
+    void AddTriangle(int a, int b, int c)
+    {
+        Triangle triangle = new Triangle();
+        triangle.indices[0] = a;
+        triangle.indices[1] = b;
+        triangle.indices[2] = c;
+        triangle.neighbourA = triangle.neighbourB = triangle.neighbourC = -1;
+        triangle.centralPoint = (vertices[a] + vertices[b] + vertices[c]) / 3;
+
+        triangles.Add(triangle);
+
+        gridVertices[a].triangles.Add(triangles.Count - 1);
+        gridVertices[b].triangles.Add(triangles.Count - 1);
+        gridVertices[c].triangles.Add(triangles.Count - 1);
+
+        SetNormal(triangle);
+    }
+
+    void SetNormal(Triangle tri)
+    {
+        tri.normal = tri.centralPoint.normalized;
     }
 
     private void LinkTriangles(int a, int b)
@@ -501,6 +535,10 @@ public class Planet : MonoBehaviour
         else Debug.LogWarning("SHOULD NOT HAPPEN !");
     }
 
+    #endregion
+
+    #region Subdivision
+
     private void LinkSubdivided(int a, int b)
     {
         if (subdividedTris[a].neighbourA == -1) subdividedTris[a].neighbourA = b;
@@ -512,107 +550,6 @@ public class Planet : MonoBehaviour
         else if (subdividedTris[b].neighbourB == -1) subdividedTris[b].neighbourB = a;
         else if (subdividedTris[b].neighbourC == -1) subdividedTris[b].neighbourC = a;
         else Debug.LogWarning("SHOULD NOT HAPPEN !");
-    }
-
-    private void OnDrawGizmos()
-    {
-        foreach (var v in vertices)
-        {
-            Gizmos.color = Color.blue;
-            Gizmos.DrawSphere(v, 0.1f);
-        }
-
-        foreach (var tri in triangles)
-        {
-            Gizmos.color = Color.red;
-            //Gizmos.DrawSphere(tri.centralPoint, 0.1f);
-        }
-    }
-
-    void AddVertex(float x, float y, float z)
-    {
-        vertices.Add(new Vector3(x, y, z));
-        gridVertices.Add(new Vertex());
-    }
-
-
-    void AddTriangle(int a, int b, int c)
-    {
-        Triangle triangle = new Triangle();
-        triangle.indices[0] = a;
-        triangle.indices[1] = b;
-        triangle.indices[2] = c;
-        triangle.neighbourA = triangle.neighbourB = triangle.neighbourC = -1;
-        triangle.centralPoint = (vertices[a] + vertices[b] + vertices[c]) / 3;
-
-        triangles.Add(triangle);
-        
-        gridVertices[a].triangles.Add(triangles.Count-1);
-        gridVertices[b].triangles.Add(triangles.Count-1);
-        gridVertices[c].triangles.Add(triangles.Count-1);
-
-        SetNormal(triangle);
-    }
-
-    void SetNormal(Triangle tri)
-    {
-        tri.normal = tri.centralPoint.normalized;
-    }
-
-
-    void CreateTreesAndRocks()
-    {
-        Vector3 triPos;
-        for (int i = 0; i < triangles.Count; i++)
-        {
-            if (triangles[i].heightLevel >= waterLevel)
-            {
-
-                triPos = triangles[i].centralPoint;
-                triPos *= forestNoiseSize;
-                float v = (forestNoise.Evaluate(triPos) + 1) * 0.5f;
-
-                
-                
-                triangles[i].treeLevel = (int) (v * (6 + 1));
-                triangles[i].treeLevel = Mathf.Clamp(triangles[i].treeLevel - 3,0,3);
-                if (triangles[i].treeLevel > 1 && RandomGenerator.GetRandomValue() > 0.75f) triangles[i].treeLevel--;
-                
-
-                for (int j = 0; j < triangles[i].treeLevel; j++)
-                {
-                    Vector3 treePos;
-                    
-                    if (triangles[i].heightLevel == 0)
-                    {
-                        treePos = vertices[triangles[i].indices[j]] +
-                            (triangles[i].centralPoint - vertices[triangles[i].indices[j]]) * 0.25f;
-                    }
-                    else
-                    {
-                        Vector3 midPoint = (vertices[triangles[i].elevationTriangle[triangles[i].heightLevel - 1].x] +
-                                            vertices[triangles[i].elevationTriangle[triangles[i].heightLevel - 1].y] +
-                                            vertices[triangles[i].elevationTriangle[triangles[i].heightLevel - 1].z]) / 3;
-                        
-                        int index = j switch
-                        {
-                            0 => triangles[i].elevationTriangle[triangles[i].heightLevel - 1].x,
-                            1 => triangles[i].elevationTriangle[triangles[i].heightLevel - 1].y,
-                            2 => triangles[i].elevationTriangle[triangles[i].heightLevel - 1].z,
-                        };
-                        
-                        treePos = vertices[index] + (midPoint - vertices[index]) * RandomGenerator.GetRandomValueInRange(0.4f,0.7f);;
-                    }
-
-                    GameObject newTree = Instantiate(tree, treePos + transform.position, Quaternion.LookRotation(triangles[i].normal + 
-                        new Vector3(RandomGenerator.GetRandomValueInRange(-0.1f,0.1f),
-                            RandomGenerator.GetRandomValueInRange(-0.1f,0.1f),
-                            RandomGenerator.GetRandomValueInRange(-0.1f,0.1f))), treeParent);
-                    
-                    newTree.transform.localScale = newTree.transform.localScale * RandomGenerator.GetRandomValueInRange(0.9f,1.1f);
-                }
-            }
-        }
     }
 
     void SubdivideSphere()
@@ -628,7 +565,7 @@ public class Planet : MonoBehaviour
         {
             Triangle[] tris = SubdivideTriangle(triangles[i]);
         }
-        
+
         triangles = new List<Triangle>();
         foreach (var tr in subdividedTris)
         {
@@ -672,7 +609,7 @@ public class Planet : MonoBehaviour
         LinkSubdivided(subdividedTris.Count - 4, subdividedTris.Count - 3);
         LinkSubdivided(subdividedTris.Count - 4, subdividedTris.Count - 2);
         LinkSubdivided(subdividedTris.Count - 4, subdividedTris.Count - 1);
-        
+
         gridVertices[middlePointA].triangles.Add(subdividedTris.Count - 4);
         gridVertices[middlePointB].triangles.Add(subdividedTris.Count - 4);
         gridVertices[middlePointC].triangles.Add(subdividedTris.Count - 4);
@@ -689,7 +626,7 @@ public class Planet : MonoBehaviour
 
         newTris[1].centralPoint = (vertices[newTris[1].indices[0]] + vertices[newTris[1].indices[1]] +
                                    vertices[newTris[1].indices[2]]) / 3;
-        
+
         gridVertices[triangleParent.indices[0]].triangles.Add(newTris[0].neighbourA);
         gridVertices[middlePointA].triangles.Add(newTris[0].neighbourA);
         gridVertices[middlePointC].triangles.Add(newTris[0].neighbourA);
@@ -727,11 +664,11 @@ public class Planet : MonoBehaviour
         newTris[2].centralPoint = (vertices[newTris[2].indices[0]] + vertices[newTris[2].indices[1]] +
                                    vertices[newTris[2].indices[2]]) / 3;
 
-        
+
         gridVertices[triangleParent.indices[1]].triangles.Add(newTris[0].neighbourB);
         gridVertices[middlePointB].triangles.Add(newTris[0].neighbourB);
         gridVertices[middlePointA].triangles.Add(newTris[0].neighbourB);
-        
+
         //LinkSubdivided(newTris[0].neighbourB,subdividedTris.Count-4);
 
 
@@ -769,7 +706,7 @@ public class Planet : MonoBehaviour
         gridVertices[triangleParent.indices[2]].triangles.Add(newTris[0].neighbourC);
         gridVertices[middlePointC].triangles.Add(newTris[0].neighbourC);
         gridVertices[middlePointB].triangles.Add(newTris[0].neighbourC);
-        
+
         //LinkSubdivided(newTris[0].neighbourC,subdividedTris.Count-4);
 
 
@@ -826,6 +763,85 @@ public class Planet : MonoBehaviour
         return vertices.Count - 1;
     }
 
+    #endregion
+
+    #region Decoration
+
+    void CreateTreesAndRocks()
+    {
+        Vector3 triPos;
+        for (int i = 0; i < triangles.Count; i++)
+        {
+            if (triangles[i].heightLevel >= waterLevel)
+            {
+                triPos = triangles[i].centralPoint;
+                triPos *= forestNoiseSize;
+                float v = (forestNoise.Evaluate(triPos) + 1) * 0.5f;
+
+
+                triangles[i].treeLevel = (int)(v * (6 + 1));
+                triangles[i].treeLevel = Mathf.Clamp(triangles[i].treeLevel - 3, 0, 3);
+                if (triangles[i].treeLevel > 1 && RandomGenerator.GetRandomValue() > 0.75f) triangles[i].treeLevel--;
+
+
+                for (int j = 0; j < triangles[i].treeLevel; j++)
+                {
+                    Vector3 treePos;
+
+                    if (triangles[i].heightLevel == 0)
+                    {
+                        treePos = vertices[triangles[i].indices[j]] +
+                                  (triangles[i].centralPoint - vertices[triangles[i].indices[j]]) * 0.25f;
+                    }
+                    else
+                    {
+                        Vector3 midPoint = (vertices[triangles[i].elevationTriangle[triangles[i].heightLevel - 1].x] +
+                                            vertices[triangles[i].elevationTriangle[triangles[i].heightLevel - 1].y] +
+                                            vertices[triangles[i].elevationTriangle[triangles[i].heightLevel - 1].z]) /
+                                           3;
+
+                        int index = j switch
+                        {
+                            0 => triangles[i].elevationTriangle[triangles[i].heightLevel - 1].x,
+                            1 => triangles[i].elevationTriangle[triangles[i].heightLevel - 1].y,
+                            2 => triangles[i].elevationTriangle[triangles[i].heightLevel - 1].z,
+                        };
+
+                        treePos = vertices[index] + (midPoint - vertices[index]) *
+                            RandomGenerator.GetRandomValueInRange(0.4f, 0.7f);
+                        ;
+                    }
+
+                    GameObject newTree = Instantiate(tree, treePos + transform.position, Quaternion.LookRotation(
+                        triangles[i].normal +
+                        new Vector3(RandomGenerator.GetRandomValueInRange(-0.1f, 0.1f),
+                            RandomGenerator.GetRandomValueInRange(-0.1f, 0.1f),
+                            RandomGenerator.GetRandomValueInRange(-0.1f, 0.1f))), treeParent);
+
+                    newTree.transform.localScale = newTree.transform.localScale *
+                                                   RandomGenerator.GetRandomValueInRange(0.9f, 1.1f);
+                }
+            }
+        }
+    }
+
+    void SetHangar()
+    {
+        Triangle triangle = triangles[0];
+        hangar.localPosition = triangle.centralPoint + triangle.normal * triangle.heightLevel * heightSize;
+        hangar.localRotation = Quaternion.LookRotation(triangle.normal);
+    }
+
+    void CreateFirstExplorers()
+    {
+        explorer1.Initialize(this, 0);
+        explorer2.Initialize(this, 0);
+    }
+
+    #endregion
+
+    #region Draw Mesh
+
     int[] GetTriangleIndexesArray(Triangle[] tris)
     {
         List<int> indexes = new List<int>(0);
@@ -837,7 +853,7 @@ public class Planet : MonoBehaviour
                 indexes.Add(tri.indices[0]);
                 indexes.Add(tri.indices[1]);
                 indexes.Add(tri.indices[2]);
-                
+
                 vertexColors[tri.indices[0]] = Color.Lerp(Color.white, Color.black, 0);
                 vertexColors[tri.indices[1]] = Color.Lerp(Color.white, Color.black, 0);
                 vertexColors[tri.indices[2]] = Color.Lerp(Color.white, Color.black, 0);
@@ -847,10 +863,13 @@ public class Planet : MonoBehaviour
                 indexes.Add(tri.elevationTriangle[tri.heightLevel - 1].x);
                 indexes.Add(tri.elevationTriangle[tri.heightLevel - 1].y);
                 indexes.Add(tri.elevationTriangle[tri.heightLevel - 1].z);
-                
-                vertexColors[tri.elevationTriangle[tri.heightLevel - 1].x] = Color.Lerp(Color.white, Color.black, (float) tri.heightLevel / maxHeight);
-                vertexColors[tri.elevationTriangle[tri.heightLevel - 1].y] = Color.Lerp(Color.white, Color.black, (float) tri.heightLevel / maxHeight);
-                vertexColors[tri.elevationTriangle[tri.heightLevel - 1].z] = Color.Lerp(Color.white, Color.black, (float) tri.heightLevel / maxHeight);
+
+                vertexColors[tri.elevationTriangle[tri.heightLevel - 1].x] =
+                    Color.Lerp(Color.white, Color.black, (float)tri.heightLevel / maxHeight);
+                vertexColors[tri.elevationTriangle[tri.heightLevel - 1].y] =
+                    Color.Lerp(Color.white, Color.black, (float)tri.heightLevel / maxHeight);
+                vertexColors[tri.elevationTriangle[tri.heightLevel - 1].z] =
+                    Color.Lerp(Color.white, Color.black, (float)tri.heightLevel / maxHeight);
             }
         }
 
@@ -859,31 +878,48 @@ public class Planet : MonoBehaviour
         {
             newVert = vertices[r.a];
             vertices.Add(newVert);
-            
+
             newVert = vertices[r.b];
             vertices.Add(newVert);
-            
+
             newVert = vertices[r.c];
             vertices.Add(newVert);
-            
+
             newVert = vertices[r.d];
             vertices.Add(newVert);
-            
-            vertexColors.Add(Color.Lerp(Color.white, Color.black, (float) r.elevation / maxHeight));
-            vertexColors.Add(Color.Lerp(Color.white, Color.black, (float) r.elevation / maxHeight));
-            vertexColors.Add(Color.Lerp(Color.white, Color.black, (float) r.elevation / maxHeight));
-            vertexColors.Add(Color.Lerp(Color.white, Color.black, (float) r.elevation / maxHeight));
-            
-            
-            indexes.Add(vertices.Count-3);
-            indexes.Add(vertices.Count-4);
-            indexes.Add(vertices.Count-2);
-            indexes.Add(vertices.Count-2);
-            indexes.Add(vertices.Count-1);
-            indexes.Add(vertices.Count-3);
+
+            vertexColors.Add(Color.Lerp(Color.white, Color.black, (float)r.elevation / maxHeight));
+            vertexColors.Add(Color.Lerp(Color.white, Color.black, (float)r.elevation / maxHeight));
+            vertexColors.Add(Color.Lerp(Color.white, Color.black, (float)r.elevation / maxHeight));
+            vertexColors.Add(Color.Lerp(Color.white, Color.black, (float)r.elevation / maxHeight));
+
+
+            indexes.Add(vertices.Count - 3);
+            indexes.Add(vertices.Count - 4);
+            indexes.Add(vertices.Count - 2);
+            indexes.Add(vertices.Count - 2);
+            indexes.Add(vertices.Count - 1);
+            indexes.Add(vertices.Count - 3);
         }
 
         return indexes.ToArray();
+    }
+
+    #endregion
+
+    private void OnDrawGizmos()
+    {
+        foreach (var v in vertices)
+        {
+            Gizmos.color = Color.blue;
+            Gizmos.DrawSphere(v, 0.1f);
+        }
+
+        foreach (var tri in triangles)
+        {
+            Gizmos.color = Color.red;
+            //Gizmos.DrawSphere(tri.centralPoint, 0.1f);
+        }
     }
 }
 

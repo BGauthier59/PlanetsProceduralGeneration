@@ -14,7 +14,15 @@ public class ExplorerBehaviour : MonoBehaviour
     [SerializeField] private float jumpDuration = 0.1f;
     [SerializeField] private int locationIndex;
     [SerializeField] private int DEBUG_Target;
-
+    
+    public void Initialize(Planet home, int index)
+    {
+        this.home = home;
+        transform.parent = home.transform;
+        locationIndex = index;
+        SetPositionOnTriangle();
+    }
+    
     [ContextMenu("Go on target")]
     public async void Init()
     {
@@ -84,6 +92,7 @@ public class ExplorerBehaviour : MonoBehaviour
         Triangle end = home.triangles[to];
 
         if (math.abs(start.heightLevel - end.heightLevel) > 1) return false;
+        if (end.heightLevel < home.waterLevel) return false;
         
         return true;
     }
@@ -123,13 +132,13 @@ public class ExplorerBehaviour : MonoBehaviour
 
             Vector3 p1, p2, p3, p4;
             p1 = explorer.localPosition;
-            p2 = explorer.localPosition + current.normal;
+            p2 = explorer.localPosition + current.normal * 0.4f;
             
             locationIndex = reversePath[i];
             Triangle next = home.triangles[locationIndex];
             Quaternion nextRot = Quaternion.LookRotation(next.normal);
             
-            p3 = explorer.localPosition + current.normal;
+            p3 = explorer.localPosition + current.normal * 0.4f;
             p4 = next.centralPoint + next.normal * next.heightLevel * home.heightSize;
 
             float timer = 0;
@@ -148,7 +157,6 @@ public class ExplorerBehaviour : MonoBehaviour
 
     #endregion
 
-    [ContextMenu("Set on position")]
     public void SetPositionOnTriangle()
     {
         Triangle triangle = home.triangles[locationIndex];
