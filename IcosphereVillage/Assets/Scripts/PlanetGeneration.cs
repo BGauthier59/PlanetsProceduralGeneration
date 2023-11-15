@@ -15,13 +15,16 @@ public class PlanetGeneration : MonoBehaviour
     [SerializeField] public List<Vertex> gridVertices = new List<Vertex>(0);
 
     [SerializeField] List<Triangle> subdividedTris = new List<Triangle>(0);
+    [SerializeField] private List<Rectangle> rects = new List<Rectangle>(0);
     public MeshFilter filter;
 
     public float size;
     public float heightSize, elevationScaleFactor;
     public int subdivisions;
+    public int maxHeight;
 
-    public TMP_Text label;
+    public uint seed;
+    
 
     public Dictionary<(int, int), int> midPointsDic = new Dictionary<(int, int), int>();
 
@@ -52,10 +55,15 @@ public class PlanetGeneration : MonoBehaviour
             }
         }
         */
+        
     }
 
     async void Start()
     {
+
+
+        RandomGenerator.SetSeed(seed);
+        
         filter.mesh = null;
 
         float t = (1 + Mathf.Sqrt(5)) / 2;
@@ -157,6 +165,8 @@ public class PlanetGeneration : MonoBehaviour
         SetElevationGrouped();
         SetOrganicDisplacement();
 
+        CreateAllRectangles();
+
         Mesh mesh = new Mesh();
         mesh.vertices = vertices.ToArray();
         mesh.triangles = GetTriangleIndexesArray(triangles.ToArray());
@@ -165,240 +175,7 @@ public class PlanetGeneration : MonoBehaviour
     }
 
 
-    #region 2eme Cercle de l'enfer [ Algo par paires ]
-
-    private async Task SetElevation()
-    {
-        Vector3 a, b, c;
-        
-        foreach (var tri in triangles)
-        {
-            
-            
-            tri.heightLevel = RandomGenerator.GetRandomValueInt(0, 3);
-            //tri.heightLevel = 1;
-            
-            int indexA, indexB, indexC;
-            indexA = indexB = indexC = -1;
-
-            // Elevates vertices
-            for (int i = 0; i < tri.heightLevel; i++)
-            {
-                a = vertices[tri.indices[0]] + tri.normal * heightSize * (i + 1);
-                b = vertices[tri.indices[1]] + tri.normal * heightSize * (i + 1);
-                c = vertices[tri.indices[2]] + tri.normal * heightSize * (i + 1);
-
-                #region Check Neighbours
-
-                // Check neighbours
-                CorrectTrianglePositions(tri, a, b, c, ref indexA, ref indexB, ref indexC);
-
-                int a_add = 0;
-                if (indexA == -1)
-                {
-                    vertices.Add(a);
-                    Debug.Log("Added Vert A at Index : " + (vertices.Count - 1));
-                    a_add = 1;
-                }
-
-                int b_add = 0;
-                if (indexB == -1)
-                {
-                    vertices.Add(b);
-                    Debug.Log("Added Vert B at Index : " + (vertices.Count - 1));
-                    b_add = 1;
-                }
-
-                int c_add = 0;
-                if (indexC == -1)
-                {
-                    vertices.Add(c);
-                    Debug.Log("Added Vert C at Index : " + (vertices.Count - 1));
-                    c_add = 1;
-                }
-
-                Vector3Int vertex = new Vector3Int(indexA == -1 ? vertices.Count - a_add - b_add - c_add : indexA,
-                    indexB == -1 ? vertices.Count - b_add - c_add : indexB,
-                    indexC == -1 ? vertices.Count - c_add : indexC);
-
-                tri.elevationTriangle.Add(vertex);
-
-                
-
-                #endregion
-            }
-        }
-    }
-
-
-    private void CorrectTrianglePositions(Triangle tri, Vector3 a, Vector3 b, Vector3 c,
-        ref int iA, ref int iB, ref int iC)
-    {
-        for (int w = 0; w < tri.indices.Length; w++)
-        {
-            int uniqueVertexIndex = -1;
-
-            if (triangles[tri.neighbourA].heightLevel == tri.heightLevel)
-            {
-                CorrectVertexPosition(tri, triangles[tri.neighbourA], w, a, b, c, ref iA, ref iB,
-                    ref iC, ref uniqueVertexIndex);
-            }
-
-            if (triangles[tri.neighbourB].heightLevel == tri.heightLevel)
-            {
-                CorrectVertexPosition(tri, triangles[tri.neighbourB], w, a, b, c, ref iA, ref iB,
-                    ref iC, ref uniqueVertexIndex);
-            }
-
-            if (triangles[tri.neighbourC].heightLevel == tri.heightLevel)
-            {
-                CorrectVertexPosition(tri, triangles[tri.neighbourC], w, a, b, c, ref iA, ref iB,
-                    ref iC, ref uniqueVertexIndex);
-            }
-        }
-    }
-
-    private void CorrectVertexPosition(Triangle tri, Triangle neighbour, int w, Vector3 a, Vector3 b, Vector3 c,
-        ref int iA, ref int iB, ref int iC, ref int unique)
-    {
-
-        int index = tri.indices[w];
-
-        for (int j = 0; j < neighbour.indices.Length; j++)
-        {
-            int nindex = neighbour.indices[j];
-
-            if (index == nindex)
-            {
-                
-                
-                int neighbourVertexIndex = j switch
-                {
-                    0 => neighbour.elevationTriangle[tri.heightLevel - 1].x,
-                    1 => neighbour.elevationTriangle[tri.heightLevel - 1].y,
-                    2 => neighbour.elevationTriangle[tri.heightLevel - 1].z,
-                };
-
-                if (unique == -1) unique = neighbourVertexIndex;
-                
-                Vector3 uniqueVertexPos = vertices[unique];
-
-                Vector3 thisVertexPos = w switch
-                {
-                    0 => a,
-                    1 => b,
-                    2 => c,
-                };
-                
-                
-                Vector3 correctedVertexPos = (uniqueVertexPos + thisVertexPos) * 0.5f;
-
-                vertices[neighbourVertexIndex] = correctedVertexPos;
-
-                Vector3Int v;
-                
-                // Set l'index de notre vertex a l'unique
-                
-                switch (w)
-                {
-                    case 0:
-                        iA = unique;
-                        break;
-                    case 1:
-                        iB = unique;
-                        break;
-                    case 2:
-                        iC = unique;
-                        break;
-                }
-                
-                // Set l'index du vertex du voisin a Unique 
-                
-                // Doit Propager l'update d'index a ces voisins ( si ces voisins sont aussi d'elevation 1
-
-                switch (j)
-                {
-                    case 0:
-                        v = neighbour.elevationTriangle[tri.heightLevel - 1];
-                        v.x = unique;
-                        neighbour.elevationTriangle[tri.heightLevel - 1] = v;
-                        break;
-                    case 1:
-                        v = neighbour.elevationTriangle[tri.heightLevel - 1];
-                        v.y = unique;
-                        neighbour.elevationTriangle[tri.heightLevel - 1] = v;
-                        break;
-                    case 2:
-                        v = neighbour.elevationTriangle[tri.heightLevel - 1];
-                        v.z = unique;
-                        neighbour.elevationTriangle[tri.heightLevel - 1] = v;
-                        break;
-                }
-
-                PropagateVertexCorrection(unique, index, neighbour, tri);
-
-
-                Debug.DrawLine(correctedVertexPos, correctedVertexPos, Color.yellow, 200);
-                Debug.DrawLine(thisVertexPos, correctedVertexPos, Color.red, 200);
-
-                break;
-            }
-        }
-    }
-
-    private void PropagateVertexCorrection(int unique,int vertexIndex,Triangle tri,Triangle origin)
-    {
-        
-        
-        for (int i = 0; i < 3; i++)
-        {
-            Triangle neighbour = null;
-
-            switch (i)
-            {
-                case 0:
-                    neighbour = triangles[tri.neighbourA];
-                    break;
-                case 1:
-                    neighbour = triangles[tri.neighbourB];
-                    break;
-                case 2:
-                    neighbour = triangles[tri.neighbourC];
-                    break;
-            }
-
-            if (neighbour.heightLevel == tri.heightLevel && neighbour != origin)
-            {
-                for (int j = 0; j < 3; j++)
-                {
-                    if (neighbour.indices[j] == vertexIndex)
-                    {
-                        Vector3Int v;
-                        switch (j)
-                        {
-                            case 0:
-                                v = neighbour.elevationTriangle[tri.heightLevel - 1];
-                                v.x = unique;
-                                neighbour.elevationTriangle[tri.heightLevel - 1] = v;
-                                break;
-                            case 1:
-                                v = neighbour.elevationTriangle[tri.heightLevel - 1];
-                                v.y = unique;
-                                neighbour.elevationTriangle[tri.heightLevel - 1] = v;
-                                break;
-                            case 2:
-                                v = neighbour.elevationTriangle[tri.heightLevel - 1];
-                                v.z = unique;
-                                neighbour.elevationTriangle[tri.heightLevel - 1] = v;
-                                break;
-                        }
-                    }
-                }   
-            }
-        }
-    }
-
-    #endregion
+   
 
     #region 2eme Cercle de l'enfer [ Algo par groupes ]
 
@@ -407,9 +184,9 @@ public class PlanetGeneration : MonoBehaviour
 
         foreach (var tri in triangles)
         {
-            tri.heightLevel = RandomGenerator.GetRandomValueInt(0, 2) * 2;
-            //tri.heightLevel = RandomGenerator.GetRandomValueInt(0, 3);
-            //tri.heightLevel = 2;
+            //tri.heightLevel = RandomGenerator.GetRandomValueInt(0, 2) * 2;
+            tri.heightLevel = RandomGenerator.GetRandomValueInt(0, maxHeight + 1);
+            //tri.heightLevel = maxHeight;
 
             for (int i = 0; i < tri.heightLevel; i++)
             {
@@ -419,7 +196,7 @@ public class PlanetGeneration : MonoBehaviour
 
         // REFAIRE CA POUR CHAQUE NIVEAU D'ELEVATION
 
-        for (int h = 0; h < 3; h++)
+        for (int h = 0; h < maxHeight; h++)
         {
             int heightLevel = h + 1;
 
@@ -433,7 +210,7 @@ public class PlanetGeneration : MonoBehaviour
                 for (int j = 0; j < gridVertex.triangles.Count; j++)
                 {
                     // SI LE TRIANGLE EST A LA BONNE HAUTEUR ET N'A PAS ETE VISITE
-                    if (triangles[gridVertex.triangles[j]].heightLevel == heightLevel && !alreadyVisited.Contains(j))
+                    if (triangles[gridVertex.triangles[j]].heightLevel >= heightLevel && !alreadyVisited.Contains(j))
                     {
                         // CALCULE LE GROUPE DE VOISINS DE MEME HAUTEUR
                         List<int> group = new List<int>();
@@ -549,7 +326,111 @@ public class PlanetGeneration : MonoBehaviour
 
     #region 3eme Cercle de l'enfer ( L'enfer des reliaisons )
 
-    
+    void CreateAllRectangles()
+    {
+        // POUR CHAQUE TRIANGLE
+        for (int i = 0; i < triangles.Count; i++)
+        {
+            // POUR CHAQUE VOISIN DU TRIANGLE
+            for (int j = 0; j < 3; j++)
+            {
+                Triangle neighbour = null;
+                switch (j)
+                {
+                    case 0:
+                        neighbour = triangles[triangles[i].neighbourA];
+                        break;
+                    case 1:
+                        neighbour = triangles[triangles[i].neighbourB];
+                        break;
+                    case 2:
+                        neighbour = triangles[triangles[i].neighbourC];
+                        break;
+                }
+                
+                // SI TRIANGLE PLUS HAUT QUE NEIGHBOUR
+                if (triangles[i].heightLevel > neighbour.heightLevel)
+                {
+                    
+                    // CHERCHER LES VERTEX COMMUNS AVEC NEIGHBOUR
+                    int vert1i = -1;
+                    int vert2i = -1;
+                    
+                    
+                    // POUR CHAQUE VERTEX DU TRIANGLE
+                    for (int k = 0; k < 3; k++)
+                    {
+                        for (int l = 0; l < 3; l++)
+                        {
+                            if (triangles[i].indices[k] == neighbour.indices[l])
+                            {
+                                if (vert1i == -1) vert1i = k;
+                                else vert2i = k;
+                            }
+                        }
+                    }
+                    
+                    // CA C'EST UN ECHANGE DE VARIABLE ( niveau CP )
+                    if (vert1i == 0 && vert2i == 2) (vert1i, vert2i) = (vert2i, vert1i);
+                    
+                    for (int h = triangles[i].heightLevel - 1; h >= neighbour.heightLevel; h--)
+                    {
+                        int a = vert1i switch
+                        {
+                            0 => triangles[i].elevationTriangle[h].x,
+                            1 => triangles[i].elevationTriangle[h].y,
+                            2 => triangles[i].elevationTriangle[h].z,
+                        };
+                        int b = vert2i switch
+                        {
+                            0 => triangles[i].elevationTriangle[h].x,
+                            1 => triangles[i].elevationTriangle[h].y,
+                            2 => triangles[i].elevationTriangle[h].z,
+                        };
+                        int c;
+                        int d;
+                        
+                        if (h == 0)
+                        {
+
+                            c = triangles[i].indices[vert1i];
+                            d = triangles[i].indices[vert2i];
+                        }
+                        else
+                        {
+                           
+                            c = vert1i switch
+                            {
+                                0 => triangles[i].elevationTriangle[h-1].x,
+                                1 => triangles[i].elevationTriangle[h-1].y,
+                                2 => triangles[i].elevationTriangle[h-1].z,
+                            };
+                            d = vert2i switch
+                            {
+                                0 => triangles[i].elevationTriangle[h-1].x,
+                                1 => triangles[i].elevationTriangle[h-1].y,
+                                2 => triangles[i].elevationTriangle[h-1].z,
+                            };
+                        }
+                        
+                        CreateRect(a,b,c,d);
+                    }
+                }
+            }
+        }
+        
+        //CreateRect();
+    }
+
+    void CreateRect(int a,int b,int c,int d)
+    {
+        Rectangle rect = new Rectangle();
+        rect.a = a;
+        rect.b = b;
+        rect.c = c;
+        rect.d = d;
+        rects.Add(rect);
+    }
 
     #endregion
     
@@ -814,11 +695,6 @@ public class PlanetGeneration : MonoBehaviour
         SetNormal(newTris[2]);
         SetNormal(newTris[3]);
 
-        Instantiate(label, newTris[0].centralPoint, quaternion.identity).text = (subdividedTris.Count-4).ToString();
-        Instantiate(label, newTris[1].centralPoint, quaternion.identity).text = (subdividedTris.Count-3).ToString();
-        Instantiate(label, newTris[2].centralPoint, quaternion.identity).text = (subdividedTris.Count-2).ToString();
-        Instantiate(label, newTris[3].centralPoint, quaternion.identity).text = (subdividedTris.Count-1).ToString();
-        
         #endregion
 
         return newTris;
@@ -865,6 +741,16 @@ public class PlanetGeneration : MonoBehaviour
             }
         }
 
+        foreach (var r in rects)
+        {
+            indexes.Add(r.b);
+            indexes.Add(r.a);
+            indexes.Add(r.c);
+            indexes.Add(r.c);
+            indexes.Add(r.d);
+            indexes.Add(r.b);
+        }
+
         return indexes.ToArray();
     }
 }
@@ -886,4 +772,10 @@ public class Triangle
 public class Vertex
 {
     public List<int> triangles = new List<int>(0);
+}
+
+[Serializable]
+public struct Rectangle
+{
+    public int a, b, c, d;
 }

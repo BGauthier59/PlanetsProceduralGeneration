@@ -1,4 +1,5 @@
 using System;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class RandomGenerator : MonoBehaviour
@@ -25,5 +26,10 @@ public class RandomGenerator : MonoBehaviour
     public static float GetRandomValueInRange(float min, float max)
     {
         return (min + GetRandomValue() * (max - min));
+    }
+    
+    public static void SetSeed(uint nseed)
+    {
+        seed = nseed;
     }
 }
