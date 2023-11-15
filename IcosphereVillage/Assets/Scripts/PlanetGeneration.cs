@@ -12,12 +12,13 @@ public class PlanetGeneration : MonoBehaviour
 {
     public List<Vector3> vertices;
     [SerializeField] public List<Triangle> triangles = new List<Triangle>(0);
+    [SerializeField] public List<Vertex> gridVertices = new List<Vertex>(0);
 
     [SerializeField] List<Triangle> subdividedTris = new List<Triangle>(0);
     public MeshFilter filter;
 
     public float size;
-    public float heightSize;
+    public float heightSize, elevationScaleFactor;
     public int subdivisions;
 
     public TMP_Text label;
@@ -30,7 +31,7 @@ public class PlanetGeneration : MonoBehaviour
 
     private void Update()
     {
-        return;
+        /*
         foreach (var tri in subdividedTris)
         {
             Debug.DrawRay(tri.centralPoint, tri.normal, Color.magenta);
@@ -41,6 +42,16 @@ public class PlanetGeneration : MonoBehaviour
             if (tri.neighbourC != -1)
                 Debug.DrawLine(tri.centralPoint, subdividedTris[tri.neighbourC].centralPoint, Color.blue);
         }
+        
+
+        for (int i = 0; i < gridVertices.Count; i++)
+        {
+            foreach (var tri in gridVertices[i].triangles)
+            {
+                Debug.DrawLine(vertices[i],triangles[tri].centralPoint,Color.HSVToRGB((float)i/gridVertices.Count,1,1));
+            }
+        }
+        */
     }
 
     async void Start()
@@ -140,7 +151,10 @@ public class PlanetGeneration : MonoBehaviour
             SubdivideSphere();
         }
 
-        await SetElevation();
+        Debug.Log(vertices.Count);
+        
+        //await SetElevation();
+        SetElevationGrouped();
         SetOrganicDisplacement();
 
         Mesh mesh = new Mesh();
@@ -151,13 +165,19 @@ public class PlanetGeneration : MonoBehaviour
     }
 
 
+    #region 2eme Cercle de l'enfer [ Algo par paires ]
+
     private async Task SetElevation()
     {
         Vector3 a, b, c;
+        
         foreach (var tri in triangles)
         {
+            
+            
             tri.heightLevel = RandomGenerator.GetRandomValueInt(0, 3);
             //tri.heightLevel = 1;
+            
             int indexA, indexB, indexC;
             indexA = indexB = indexC = -1;
 
@@ -177,6 +197,7 @@ public class PlanetGeneration : MonoBehaviour
                 if (indexA == -1)
                 {
                     vertices.Add(a);
+                    Debug.Log("Added Vert A at Index : " + (vertices.Count - 1));
                     a_add = 1;
                 }
 
@@ -184,6 +205,7 @@ public class PlanetGeneration : MonoBehaviour
                 if (indexB == -1)
                 {
                     vertices.Add(b);
+                    Debug.Log("Added Vert B at Index : " + (vertices.Count - 1));
                     b_add = 1;
                 }
 
@@ -191,6 +213,7 @@ public class PlanetGeneration : MonoBehaviour
                 if (indexC == -1)
                 {
                     vertices.Add(c);
+                    Debug.Log("Added Vert C at Index : " + (vertices.Count - 1));
                     c_add = 1;
                 }
 
@@ -199,6 +222,8 @@ public class PlanetGeneration : MonoBehaviour
                     indexC == -1 ? vertices.Count - c_add : indexC);
 
                 tri.elevationTriangle.Add(vertex);
+
+                
 
                 #endregion
             }
@@ -256,7 +281,7 @@ public class PlanetGeneration : MonoBehaviour
 
                 if (unique == -1) unique = neighbourVertexIndex;
                 
-                Vector3 neighbourVertexPos = vertices[unique];
+                Vector3 uniqueVertexPos = vertices[unique];
 
                 Vector3 thisVertexPos = w switch
                 {
@@ -266,11 +291,31 @@ public class PlanetGeneration : MonoBehaviour
                 };
                 
                 
-                Vector3 correctedVertexPos = (neighbourVertexPos + thisVertexPos) * 0.5f;
+                Vector3 correctedVertexPos = (uniqueVertexPos + thisVertexPos) * 0.5f;
 
                 vertices[neighbourVertexIndex] = correctedVertexPos;
 
                 Vector3Int v;
+                
+                // Set l'index de notre vertex a l'unique
+                
+                switch (w)
+                {
+                    case 0:
+                        iA = unique;
+                        break;
+                    case 1:
+                        iB = unique;
+                        break;
+                    case 2:
+                        iC = unique;
+                        break;
+                }
+                
+                // Set l'index du vertex du voisin a Unique 
+                
+                // Doit Propager l'update d'index a ces voisins ( si ces voisins sont aussi d'elevation 1
+
                 switch (j)
                 {
                     case 0:
@@ -290,21 +335,10 @@ public class PlanetGeneration : MonoBehaviour
                         break;
                 }
 
-                switch (w)
-                {
-                    case 0:
-                        iA = unique;
-                        break;
-                    case 1:
-                        iB = unique;
-                        break;
-                    case 2:
-                        iC = unique;
-                        break;
-                }
+                PropagateVertexCorrection(unique, index, neighbour, tri);
 
 
-                Debug.DrawLine(neighbourVertexPos, correctedVertexPos, Color.yellow, 200);
+                Debug.DrawLine(correctedVertexPos, correctedVertexPos, Color.yellow, 200);
                 Debug.DrawLine(thisVertexPos, correctedVertexPos, Color.red, 200);
 
                 break;
@@ -312,6 +346,214 @@ public class PlanetGeneration : MonoBehaviour
         }
     }
 
+    private void PropagateVertexCorrection(int unique,int vertexIndex,Triangle tri,Triangle origin)
+    {
+        
+        
+        for (int i = 0; i < 3; i++)
+        {
+            Triangle neighbour = null;
+
+            switch (i)
+            {
+                case 0:
+                    neighbour = triangles[tri.neighbourA];
+                    break;
+                case 1:
+                    neighbour = triangles[tri.neighbourB];
+                    break;
+                case 2:
+                    neighbour = triangles[tri.neighbourC];
+                    break;
+            }
+
+            if (neighbour.heightLevel == tri.heightLevel && neighbour != origin)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    if (neighbour.indices[j] == vertexIndex)
+                    {
+                        Vector3Int v;
+                        switch (j)
+                        {
+                            case 0:
+                                v = neighbour.elevationTriangle[tri.heightLevel - 1];
+                                v.x = unique;
+                                neighbour.elevationTriangle[tri.heightLevel - 1] = v;
+                                break;
+                            case 1:
+                                v = neighbour.elevationTriangle[tri.heightLevel - 1];
+                                v.y = unique;
+                                neighbour.elevationTriangle[tri.heightLevel - 1] = v;
+                                break;
+                            case 2:
+                                v = neighbour.elevationTriangle[tri.heightLevel - 1];
+                                v.z = unique;
+                                neighbour.elevationTriangle[tri.heightLevel - 1] = v;
+                                break;
+                        }
+                    }
+                }   
+            }
+        }
+    }
+
+    #endregion
+
+    #region 2eme Cercle de l'enfer [ Algo par groupes ]
+
+    void SetElevationGrouped()
+    {
+
+        foreach (var tri in triangles)
+        {
+            tri.heightLevel = RandomGenerator.GetRandomValueInt(0, 2) * 2;
+            //tri.heightLevel = RandomGenerator.GetRandomValueInt(0, 3);
+            //tri.heightLevel = 2;
+
+            for (int i = 0; i < tri.heightLevel; i++)
+            {
+                tri.elevationTriangle.Add(Vector3Int.zero);
+            }
+        }
+
+        // REFAIRE CA POUR CHAQUE NIVEAU D'ELEVATION
+
+        for (int h = 0; h < 3; h++)
+        {
+            int heightLevel = h + 1;
+
+            for (int i = 0; i < gridVertices.Count; i++)
+            {
+                Vertex gridVertex = gridVertices[i];
+
+                List<int> alreadyVisited = new List<int>(0);
+
+                // POUR CHAQUE TRIANGLE DU VERTEX
+                for (int j = 0; j < gridVertex.triangles.Count; j++)
+                {
+                    // SI LE TRIANGLE EST A LA BONNE HAUTEUR ET N'A PAS ETE VISITE
+                    if (triangles[gridVertex.triangles[j]].heightLevel == heightLevel && !alreadyVisited.Contains(j))
+                    {
+                        // CALCULE LE GROUPE DE VOISINS DE MEME HAUTEUR
+                        List<int> group = new List<int>();
+                        FormElevationGroup(gridVertex.triangles.ToArray(), j, heightLevel,ref group);
+                    
+                        Vector3 midPoint = Vector3.zero;
+
+                        for (int k = 0; k < group.Count; k++)
+                        {
+                            // RENSEIGNE LES TRIANGLES VISITES
+                            alreadyVisited.Add(group[k]);
+                        
+                            // CALCULE LE POINT D'ELEVATION
+                            Vector3 heightPoint = (triangles[gridVertex.triangles[group[k]]].centralPoint + (vertices[i] - triangles[gridVertex.triangles[group[k]]].centralPoint) * elevationScaleFactor)+
+                                                  triangles[gridVertex.triangles[group[k]]].normal * heightSize *
+                                                  heightLevel;
+                        
+                            // L'AJOUTE A LA MOYENNE
+                            midPoint += heightPoint;
+                        }
+                    
+                        // FAIS LA MOYENNE DES POINTS DU GROUPE
+                        midPoint /= group.Count;
+                    
+                        // AJOUTE LE MID POINT AUX VERTICES
+                        vertices.Add(midPoint);
+                    
+                        // POUR TOUS LES TRIANGLES DU GROUPE...
+                        for (int k = 0; k < group.Count; k++)
+                        {
+                            Vector3Int v = triangles[gridVertex.triangles[group[k]]].elevationTriangle[heightLevel - 1];
+                            int vertIndex = 0;
+                        
+                            for (int l = 0; l < 3; l++)
+                            {
+                                if (triangles[gridVertex.triangles[group[k]]].indices[l] == i)
+                                {
+                                    vertIndex = l;
+                                    break;
+                                }
+                            }
+                        
+                            // ... ON SET L'INDEX DU POINT D'ELEVATION ( mid Point calculé précédemment )
+                            switch (vertIndex)
+                            {
+                                case 0:
+                                    v.x = vertices.Count - 1;
+                                    break;
+                                case 1:
+                                    v.y = vertices.Count - 1;
+                                    break;
+                                case 2:
+                                    v.z = vertices.Count - 1;
+                                    break;
+                            }
+
+                            triangles[gridVertex.triangles[group[k]]].elevationTriangle[heightLevel - 1] = v;
+                        }
+
+                        Debug.Log("GROUP FORMED AROUND VERTEX " + i + ", AMOUNT: " + group.Count);
+                    
+                    }
+                }
+            } 
+        }
+        
+        
+    }
+
+    void FormElevationGroup(int[] vertexTris, int origin,int heightLvl, ref List<int> group)
+    {
+        group.Add(origin);
+        
+        // SI LE GROUPE CONTIENT DEJA 6 TRIANGLES ( maximum ) ON STOP
+        if (group.Count >= 6) return;
+
+        // POUR CHAQUE VOISIN DE ORIGIN
+        for (int nIndex = 0; nIndex < 3; nIndex++)
+        {
+            int neighbour = -1;
+            
+            switch (nIndex)
+            {
+                case 0:
+                    neighbour = triangles[vertexTris[origin]].neighbourA;
+                    break;
+                case 1:
+                    neighbour = triangles[vertexTris[origin]].neighbourB;
+                    break;
+                case 2:
+                    neighbour = triangles[vertexTris[origin]].neighbourC;
+                    break;
+            }
+            
+            // SI VOISIN DE ORIGIN EST PRESENT DANS L'ARRAY DE TRIANGLES FOURNI
+            for (int testedIndex = 0; testedIndex < vertexTris.Length; testedIndex++)
+            {
+                if (vertexTris[testedIndex] == neighbour)
+                {
+                    // SI LE VOISIN DE ORIGIN EST A LA BONNE HAUTEUR ET N'EST PAS DEJA DANS LE GROUPE
+                    if (triangles[neighbour].heightLevel >= heightLvl && !group.Contains(testedIndex))
+                    {
+                        // ALORS LE VOISIN EST AJOUTE AU GROUPE ET VA LUI AUSSI CHECKER CES VOISINS
+                        FormElevationGroup(vertexTris,testedIndex,heightLvl,ref group);
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
+    #endregion
+
+    #region 3eme Cercle de l'enfer ( L'enfer des reliaisons )
+
+    
+
+    #endregion
+    
+    
     private void SetOrganicDisplacement()
     {
     }
@@ -347,7 +589,7 @@ public class PlanetGeneration : MonoBehaviour
         foreach (var v in vertices)
         {
             Gizmos.color = Color.blue;
-            Gizmos.DrawSphere(v, 0.01f);
+            Gizmos.DrawSphere(v, 0.1f);
         }
 
         foreach (var tri in triangles)
@@ -360,6 +602,7 @@ public class PlanetGeneration : MonoBehaviour
     void AddVertex(float x, float y, float z)
     {
         vertices.Add(new Vector3(x, y, z));
+        gridVertices.Add(new Vertex());
     }
 
 
@@ -373,6 +616,10 @@ public class PlanetGeneration : MonoBehaviour
         triangle.centralPoint = (vertices[a] + vertices[b] + vertices[c]) / 3;
 
         triangles.Add(triangle);
+        
+        gridVertices[a].triangles.Add(triangles.Count-1);
+        gridVertices[b].triangles.Add(triangles.Count-1);
+        gridVertices[c].triangles.Add(triangles.Count-1);
 
         SetNormal(triangle);
     }
@@ -386,13 +633,16 @@ public class PlanetGeneration : MonoBehaviour
     {
         midPointsDic.Clear();
         subdividedTris.Clear();
+        foreach (var vert in gridVertices)
+        {
+            vert.triangles.Clear();
+        }
 
         for (int i = 0; i < triangles.Count; i++)
         {
             Triangle[] tris = SubdivideTriangle(triangles[i]);
         }
-
-        Debug.Log(subdividedTris.Count);
+        
         triangles = new List<Triangle>();
         foreach (var tr in subdividedTris)
         {
@@ -436,6 +686,10 @@ public class PlanetGeneration : MonoBehaviour
         LinkSubdivided(subdividedTris.Count - 4, subdividedTris.Count - 3);
         LinkSubdivided(subdividedTris.Count - 4, subdividedTris.Count - 2);
         LinkSubdivided(subdividedTris.Count - 4, subdividedTris.Count - 1);
+        
+        gridVertices[middlePointA].triangles.Add(subdividedTris.Count - 4);
+        gridVertices[middlePointB].triangles.Add(subdividedTris.Count - 4);
+        gridVertices[middlePointC].triangles.Add(subdividedTris.Count - 4);
 
         #endregion
 
@@ -449,6 +703,10 @@ public class PlanetGeneration : MonoBehaviour
 
         newTris[1].centralPoint = (vertices[newTris[1].indices[0]] + vertices[newTris[1].indices[1]] +
                                    vertices[newTris[1].indices[2]]) / 3;
+        
+        gridVertices[triangleParent.indices[0]].triangles.Add(newTris[0].neighbourA);
+        gridVertices[middlePointA].triangles.Add(newTris[0].neighbourA);
+        gridVertices[middlePointC].triangles.Add(newTris[0].neighbourA);
 
         //LinkSubdivided(newTris[0].neighbourA, subdividedTris.Count - 4);
 
@@ -483,6 +741,11 @@ public class PlanetGeneration : MonoBehaviour
         newTris[2].centralPoint = (vertices[newTris[2].indices[0]] + vertices[newTris[2].indices[1]] +
                                    vertices[newTris[2].indices[2]]) / 3;
 
+        
+        gridVertices[triangleParent.indices[1]].triangles.Add(newTris[0].neighbourB);
+        gridVertices[middlePointB].triangles.Add(newTris[0].neighbourB);
+        gridVertices[middlePointA].triangles.Add(newTris[0].neighbourB);
+        
         //LinkSubdivided(newTris[0].neighbourB,subdividedTris.Count-4);
 
 
@@ -517,6 +780,10 @@ public class PlanetGeneration : MonoBehaviour
         newTris[3].centralPoint = (vertices[newTris[3].indices[0]] + vertices[newTris[3].indices[1]] +
                                    vertices[newTris[3].indices[2]]) / 3;
 
+        gridVertices[triangleParent.indices[2]].triangles.Add(newTris[0].neighbourC);
+        gridVertices[middlePointC].triangles.Add(newTris[0].neighbourC);
+        gridVertices[middlePointB].triangles.Add(newTris[0].neighbourC);
+        
         //LinkSubdivided(newTris[0].neighbourC,subdividedTris.Count-4);
 
 
@@ -572,6 +839,7 @@ public class PlanetGeneration : MonoBehaviour
         Vector3 midPoint = Vector3.Lerp(vertices[point1], vertices[point2], 0.5f);
         midPoint = transform.position + (midPoint - transform.position).normalized * size;
         vertices.Add(midPoint);
+        gridVertices.Add(new Vertex());
         midPointsDic.Add((point1, point2), vertices.Count - 1);
 
         return vertices.Count - 1;
@@ -612,4 +880,10 @@ public class Triangle
 
     public List<Vector3Int> elevationTriangle = new List<Vector3Int>();
     public int heightLevel = 0;
+}
+
+[Serializable]
+public class Vertex
+{
+    public List<int> triangles = new List<int>(0);
 }
