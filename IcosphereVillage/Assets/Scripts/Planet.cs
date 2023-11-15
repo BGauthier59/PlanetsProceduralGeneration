@@ -190,8 +190,10 @@ public class Planet : MonoBehaviour
     void SetElevationGrouped()
     {
         Vector3 triPos;
+        int it = 0;
         foreach (var tri in triangles)
         {
+            
             //tri.heightLevel = RandomGenerator.GetRandomValueInt(0, 2) * 2;
             //tri.heightLevel = RandomGenerator.GetRandomValueInt(0, maxHeight + 1);
             //tri.heightLevel = maxHeight;
@@ -200,13 +202,18 @@ public class Planet : MonoBehaviour
             triPos *= noiseSize;
             float v = (elevationNoise.Evaluate(triPos) + 1) * 0.5f;
 
-            tri.heightLevel = (int) (v * (maxHeight + 1));
+            //tri.heightLevel = (int) (v * (maxHeight + 1));
+            tri.heightLevel = 0;
+            
+            if(it == 0) tri.heightLevel = maxHeight;
+            it++;
 
             for (int i = 0; i < tri.heightLevel; i++)
             {
                 tri.elevationTriangle.Add(Vector3Int.zero);
             }
         }
+
 
         // REFAIRE CA POUR CHAQUE NIVEAU D'ELEVATION
 

@@ -12,7 +12,6 @@ public class WorldManager : MonoSingleton<WorldManager>
     private void Start()
     {
         CreateNewPlanet(Vector3.zero);
-        CreateNewPlanet(new Vector3(50, 50, 50));
     }
 
     public Transform GetPlanet(int index)

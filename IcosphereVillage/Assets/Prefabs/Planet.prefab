@@ -189,7 +189,7 @@ MonoBehaviour:
   size: 3
   heightSize: 0.3
   elevationScaleFactor: 0.75
-  subdivisions: 3
+  subdivisions: 2
   maxHeight: 3
   seed: 5
   noiseSize: 0.3
