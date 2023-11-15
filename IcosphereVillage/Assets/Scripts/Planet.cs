@@ -223,6 +223,8 @@ public class Planet : MonoBehaviour
 
         mesh.RecalculateNormals();
         filter.mesh = mesh;
+
+        GetComponent<MeshCollider>().sharedMesh = mesh;
     }
 
     #region Elevation
@@ -244,7 +246,7 @@ public class Planet : MonoBehaviour
                 tri.heightLevel = waterLevel;
             }
             else tri.heightLevel = (int)(v * (maxHeight + 1));
-
+            
             for (int i = 0; i < tri.heightLevel; i++)
             {
                 tri.elevationTriangle.Add(Vector3Int.zero);
@@ -913,6 +915,7 @@ public class Planet : MonoBehaviour
 
     private void OnDrawGizmos()
     {
+        return;
         foreach (var v in vertices)
         {
             Gizmos.color = Color.blue;

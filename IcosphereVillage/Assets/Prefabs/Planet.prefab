@@ -126,6 +126,7 @@ GameObject:
   - component: {fileID: 2430389131594545572}
   - component: {fileID: 8397276476116871114}
   - component: {fileID: 3254101452558638239}
+  - component: {fileID: 7712598101018856616}
   m_Layer: 0
   m_Name: Planet
   m_TagString: Untagged
@@ -255,6 +256,28 @@ MonoBehaviour:
   hangar: {fileID: 2450179829027447185}
   explorer1: {fileID: 1974642023368158110}
   explorer2: {fileID: 3943040686702049936}
+--- !u!64 &7712598101018856616
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4959502637196766137}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 0}
 --- !u!1001 &3238465822584297972
 PrefabInstance:
   m_ObjectHideFlags: 0
