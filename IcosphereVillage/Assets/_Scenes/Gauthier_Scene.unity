@@ -172,7 +172,7 @@ MonoBehaviour:
   rotateSensibility: 0.3
   camera: {fileID: 1674502942}
   baseDistance: 10
-  minMaxDistance: {x: 5, y: 20}
+  minMaxDistance: {x: -3, y: 13}
   cameraSpeed: 5
   stepValue: 0.01
 --- !u!114 &371637860
@@ -518,8 +518,9 @@ MonoBehaviour:
   heightSize: 0.3
   elevationScaleFactor: 0.75
   subdivisions: 2
-  maxHeight: 2
-  seed: 42
+  maxHeight: 3
+  seed: 5
+  noiseSize: 0.3
 --- !u!23 &1339432612
 MeshRenderer:
   m_ObjectHideFlags: 0
