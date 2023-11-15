@@ -24,7 +24,9 @@ public class PlanetGeneration : MonoBehaviour
     public int maxHeight;
 
     public uint seed;
-    
+    public float noiseSize;
+
+    public Noise elevationNoise;
 
     public Dictionary<(int, int), int> midPointsDic = new Dictionary<(int, int), int>();
 
@@ -55,12 +57,12 @@ public class PlanetGeneration : MonoBehaviour
             }
         }
         */
-        
+
     }
 
     async void Start()
     {
-
+        elevationNoise = new Noise((int)seed);
 
         RandomGenerator.SetSeed(seed);
         
@@ -161,32 +163,42 @@ public class PlanetGeneration : MonoBehaviour
 
         Debug.Log(vertices.Count);
         
-        //await SetElevation();
         SetElevationGrouped();
         SetOrganicDisplacement();
 
         CreateAllRectangles();
 
+        
+
         Mesh mesh = new Mesh();
+
+
+        int[] tris = GetTriangleIndexesArray(triangles.ToArray());
         mesh.vertices = vertices.ToArray();
-        mesh.triangles = GetTriangleIndexesArray(triangles.ToArray());
+        mesh.triangles = tris;
+        
         mesh.RecalculateNormals();
         filter.mesh = mesh;
     }
 
 
-   
 
     #region 2eme Cercle de l'enfer [ Algo par groupes ]
 
     void SetElevationGrouped()
     {
-
+        Vector3 triPos;
         foreach (var tri in triangles)
         {
             //tri.heightLevel = RandomGenerator.GetRandomValueInt(0, 2) * 2;
-            tri.heightLevel = RandomGenerator.GetRandomValueInt(0, maxHeight + 1);
+            //tri.heightLevel = RandomGenerator.GetRandomValueInt(0, maxHeight + 1);
             //tri.heightLevel = maxHeight;
+            
+            triPos = tri.centralPoint;
+            triPos *= noiseSize;
+            float v = (elevationNoise.Evaluate(triPos) + 1) * 0.5f;
+
+            tri.heightLevel = (int) (v * (maxHeight + 1));
 
             for (int i = 0; i < tri.heightLevel; i++)
             {
@@ -741,14 +753,27 @@ public class PlanetGeneration : MonoBehaviour
             }
         }
 
+        Vector3 newVert;
         foreach (var r in rects)
         {
-            indexes.Add(r.b);
-            indexes.Add(r.a);
-            indexes.Add(r.c);
-            indexes.Add(r.c);
-            indexes.Add(r.d);
-            indexes.Add(r.b);
+            newVert = vertices[r.a];
+            vertices.Add(newVert);
+            
+            newVert = vertices[r.b];
+            vertices.Add(newVert);
+            
+            newVert = vertices[r.c];
+            vertices.Add(newVert);
+            
+            newVert = vertices[r.d];
+            vertices.Add(newVert);
+            
+            indexes.Add(vertices.Count-3);
+            indexes.Add(vertices.Count-4);
+            indexes.Add(vertices.Count-2);
+            indexes.Add(vertices.Count-2);
+            indexes.Add(vertices.Count-1);
+            indexes.Add(vertices.Count-3);
         }
 
         return indexes.ToArray();
