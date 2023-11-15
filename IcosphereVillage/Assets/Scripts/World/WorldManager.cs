@@ -9,10 +9,13 @@ public class WorldManager : MonoSingleton<WorldManager>
     [SerializeField] private List<Transform> allPlanets;
     [SerializeField] private Planet planetPrefab;
 
+    [SerializeField] private uint seed;
+
     private void Start()
     {
+        RandomGenerator.seedGeneratorSeed = seed;
         CreateNewPlanet(Vector3.zero);
-        CreateNewPlanet(new Vector3(50, 50, 50));
+        //CreateNewPlanet(new Vector3(50, 50, 50));
     }
 
     public Transform GetPlanet(int index)
