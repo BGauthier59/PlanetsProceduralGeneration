@@ -11,6 +11,7 @@ public class ExplorerBehaviour : MonoBehaviour
 {
     [SerializeField] private Transform explorer;
     [SerializeField] private Planet home;
+    [SerializeField] private float jumpDuration = 0.1f;
     [SerializeField] private int locationIndex;
     [SerializeField] private int DEBUG_Target;
 
@@ -118,26 +119,26 @@ public class ExplorerBehaviour : MonoBehaviour
         for (int i = reversePath.Length - 1; i >= 0; i--)
         {            
             Triangle current = home.triangles[locationIndex];
-            Quaternion rot = explorer.rotation;
+            Quaternion rot = explorer.localRotation;
 
             Vector3 p1, p2, p3, p4;
-            p1 = explorer.position;
-            p2 = explorer.position + current.normal;
+            p1 = explorer.localPosition;
+            p2 = explorer.localPosition + current.normal;
             
             locationIndex = reversePath[i];
             Triangle next = home.triangles[locationIndex];
             Quaternion nextRot = Quaternion.LookRotation(next.normal);
             
-            p3 = explorer.position + current.normal;
+            p3 = explorer.localPosition + current.normal;
             p4 = next.centralPoint + next.normal * next.heightLevel * home.heightSize;
 
             float timer = 0;
-            while (timer < 0.2f)
+            while (timer < jumpDuration)
             {
                 await Task.Yield();
                 timer += Time.deltaTime;
-                explorer.position = ExBeziers.CubicBeziersCurve(p1, p2, p3, p4, timer / 0.2f);
-                explorer.rotation = Quaternion.Slerp(rot, nextRot, timer / 0.2f);
+                explorer.localPosition = ExBeziers.CubicBeziersCurve(p1, p2, p3, p4, timer / jumpDuration);
+                explorer.localRotation = Quaternion.Slerp(rot, nextRot, timer / jumpDuration);
             }
             
             SetPositionOnTriangle();
@@ -151,8 +152,8 @@ public class ExplorerBehaviour : MonoBehaviour
     public void SetPositionOnTriangle()
     {
         Triangle triangle = home.triangles[locationIndex];
-        explorer.position = triangle.centralPoint + triangle.normal * triangle.heightLevel * home.heightSize;
-        explorer.rotation = Quaternion.LookRotation(triangle.normal);
+        explorer.localPosition = triangle.centralPoint + triangle.normal * triangle.heightLevel * home.heightSize;
+        explorer.localRotation = Quaternion.LookRotation(triangle.normal);
     }
 
     public int[] GetNeighbours(int index)
