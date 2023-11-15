@@ -17,7 +17,14 @@ public class Planet : MonoBehaviour
     [SerializeField] List<Triangle> subdividedTris = new List<Triangle>(0);
     [SerializeField] private List<Rectangle> rects = new List<Rectangle>(0);
     public MeshFilter filter;
+    public MeshRenderer planetRenderer;
+    public MeshRenderer waterRenderer;
+    public Material[] stratsMats;
+    public Material[] waterMats;
 
+    public GameObject tree;
+    public Transform treeParent;
+    
     public float size;
     public float heightSize, elevationScaleFactor;
     public int subdivisions;
@@ -25,12 +32,18 @@ public class Planet : MonoBehaviour
 
     public uint seed;
     public float noiseSize;
+    public float forestNoiseSize;
 
+    public int waterLevel;
+    
     [SerializeField] private Transform waterSphere;
 
     public Noise elevationNoise;
+    public Noise forestNoise;
 
     public Dictionary<(int, int), int> midPointsDic = new Dictionary<(int, int), int>();
+
+    public List<Color> vertexColors = new List<Color>();
 
     private void OnValidate()
     {
@@ -64,9 +77,25 @@ public class Planet : MonoBehaviour
 
     public async void Initialize()
     {
+        seed = RandomGenerator.GetRandomSeed();
+        
         elevationNoise = new Noise((int)seed);
+        forestNoise = new Noise((int)seed+1);
 
         RandomGenerator.SetSeed(seed);
+
+        // MAX HEIGHT DE 2 A 5
+        maxHeight = RandomGenerator.GetRandomValueInt(2, 6);
+        
+        // WATER LEVEL DE 0 ( pas d'eau ) A MAX HEIGHT - 1 ( 2 niveaux de ground minimum )
+        waterLevel = RandomGenerator.GetRandomValueInt(0, maxHeight);
+        waterSphere.localScale = Vector3.one * (size * 2 + heightSize * (waterLevel * 2 -0.5f));
+
+        planetRenderer.material = new Material(stratsMats[RandomGenerator.GetRandomValueInt(0, stratsMats.Length)]);
+        planetRenderer.material.SetFloat("_heightMax",maxHeight);
+        planetRenderer.material.SetFloat("_GroundLevel",waterLevel);
+        
+        waterRenderer.material = waterMats[RandomGenerator.GetRandomValueInt(0, waterMats.Length)];
         
         filter.mesh = null;
 
@@ -168,19 +197,25 @@ public class Planet : MonoBehaviour
         SetElevationGrouped();
         SetOrganicDisplacement();
 
+        CreateTreesAndRocks();
+        
         CreateAllRectangles();
         
         Mesh mesh = new Mesh();
 
+        for (int i = 0; i < vertices.Count; i++)
+        {
+            vertexColors.Add(new Color());   
+        }
 
         int[] tris = GetTriangleIndexesArray(triangles.ToArray());
         mesh.vertices = vertices.ToArray();
         mesh.triangles = tris;
+        mesh.colors = vertexColors.ToArray();
         
         mesh.RecalculateNormals();
         filter.mesh = mesh;
-
-        waterSphere.localScale = Vector3.one * (size * 2 + heightSize * 0.5f);
+        
     }
 
 
@@ -284,8 +319,6 @@ public class Planet : MonoBehaviour
                             triangles[gridVertex.triangles[group[k]]].elevationTriangle[heightLevel - 1] = v;
                         }
 
-                        Debug.Log("GROUP FORMED AROUND VERTEX " + i + ", AMOUNT: " + group.Count);
-                    
                     }
                 }
             } 
@@ -427,7 +460,7 @@ public class Planet : MonoBehaviour
                             };
                         }
                         
-                        CreateRect(a,b,c,d);
+                        CreateRect(a,b,c,d,h+1);
                     }
                 }
             }
@@ -436,13 +469,14 @@ public class Planet : MonoBehaviour
         //CreateRect();
     }
 
-    void CreateRect(int a,int b,int c,int d)
+    void CreateRect(int a,int b,int c,int d,int elevation)
     {
         Rectangle rect = new Rectangle();
         rect.a = a;
         rect.b = b;
         rect.c = c;
         rect.d = d;
+        rect.elevation = elevation;
         rects.Add(rect);
     }
 
@@ -522,6 +556,62 @@ public class Planet : MonoBehaviour
     void SetNormal(Triangle tri)
     {
         tri.normal = tri.centralPoint.normalized;
+    }
+
+
+    void CreateTreesAndRocks()
+    {
+        Vector3 triPos;
+        for (int i = 0; i < triangles.Count; i++)
+        {
+            if (triangles[i].heightLevel >= waterLevel)
+            {
+
+                triPos = triangles[i].centralPoint;
+                triPos *= forestNoiseSize;
+                float v = (forestNoise.Evaluate(triPos) + 1) * 0.5f;
+
+                
+                
+                triangles[i].treeLevel = (int) (v * (6 + 1));
+                triangles[i].treeLevel = Mathf.Clamp(triangles[i].treeLevel - 3,0,3);
+                if (triangles[i].treeLevel > 1 && RandomGenerator.GetRandomValue() > 0.75f) triangles[i].treeLevel--;
+                
+
+                for (int j = 0; j < triangles[i].treeLevel; j++)
+                {
+                    Vector3 treePos;
+                    
+                    if (triangles[i].heightLevel == 0)
+                    {
+                        treePos = vertices[triangles[i].indices[j]] +
+                            (triangles[i].centralPoint - vertices[triangles[i].indices[j]]) * 0.25f;
+                    }
+                    else
+                    {
+                        Vector3 midPoint = (vertices[triangles[i].elevationTriangle[triangles[i].heightLevel - 1].x] +
+                                            vertices[triangles[i].elevationTriangle[triangles[i].heightLevel - 1].y] +
+                                            vertices[triangles[i].elevationTriangle[triangles[i].heightLevel - 1].z]) / 3;
+                        
+                        int index = j switch
+                        {
+                            0 => triangles[i].elevationTriangle[triangles[i].heightLevel - 1].x,
+                            1 => triangles[i].elevationTriangle[triangles[i].heightLevel - 1].y,
+                            2 => triangles[i].elevationTriangle[triangles[i].heightLevel - 1].z,
+                        };
+                        
+                        treePos = vertices[index] + (midPoint - vertices[index]) * RandomGenerator.GetRandomValueInRange(0.4f,0.7f);;
+                    }
+
+                    GameObject newTree = Instantiate(tree, treePos + transform.position, Quaternion.LookRotation(triangles[i].normal + 
+                        new Vector3(RandomGenerator.GetRandomValueInRange(-0.1f,0.1f),
+                            RandomGenerator.GetRandomValueInRange(-0.1f,0.1f),
+                            RandomGenerator.GetRandomValueInRange(-0.1f,0.1f))), treeParent);
+                    
+                    newTree.transform.localScale = newTree.transform.localScale * RandomGenerator.GetRandomValueInRange(0.9f,1.1f);
+                }
+            }
+        }
     }
 
     void SubdivideSphere()
@@ -746,12 +836,20 @@ public class Planet : MonoBehaviour
                 indexes.Add(tri.indices[0]);
                 indexes.Add(tri.indices[1]);
                 indexes.Add(tri.indices[2]);
+                
+                vertexColors[tri.indices[0]] = Color.Lerp(Color.white, Color.black, 0);
+                vertexColors[tri.indices[1]] = Color.Lerp(Color.white, Color.black, 0);
+                vertexColors[tri.indices[2]] = Color.Lerp(Color.white, Color.black, 0);
             }
             else
             {
                 indexes.Add(tri.elevationTriangle[tri.heightLevel - 1].x);
                 indexes.Add(tri.elevationTriangle[tri.heightLevel - 1].y);
                 indexes.Add(tri.elevationTriangle[tri.heightLevel - 1].z);
+                
+                vertexColors[tri.elevationTriangle[tri.heightLevel - 1].x] = Color.Lerp(Color.white, Color.black, (float) tri.heightLevel / maxHeight);
+                vertexColors[tri.elevationTriangle[tri.heightLevel - 1].y] = Color.Lerp(Color.white, Color.black, (float) tri.heightLevel / maxHeight);
+                vertexColors[tri.elevationTriangle[tri.heightLevel - 1].z] = Color.Lerp(Color.white, Color.black, (float) tri.heightLevel / maxHeight);
             }
         }
 
@@ -769,6 +867,12 @@ public class Planet : MonoBehaviour
             
             newVert = vertices[r.d];
             vertices.Add(newVert);
+            
+            vertexColors.Add(Color.Lerp(Color.white, Color.black, (float) r.elevation / maxHeight));
+            vertexColors.Add(Color.Lerp(Color.white, Color.black, (float) r.elevation / maxHeight));
+            vertexColors.Add(Color.Lerp(Color.white, Color.black, (float) r.elevation / maxHeight));
+            vertexColors.Add(Color.Lerp(Color.white, Color.black, (float) r.elevation / maxHeight));
+            
             
             indexes.Add(vertices.Count-3);
             indexes.Add(vertices.Count-4);
@@ -793,6 +897,8 @@ public class Triangle
 
     public List<Vector3Int> elevationTriangle = new List<Vector3Int>();
     public int heightLevel = 0;
+    public int treeLevel = 0;
+    public int rockLevel = 0;
 }
 
 [Serializable]
@@ -805,4 +911,5 @@ public class Vertex
 public struct Rectangle
 {
     public int a, b, c, d;
+    public int elevation;
 }
