@@ -5,7 +5,7 @@ using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : MonoSingleton<PlayerController>
 {
     [SerializeField] private Transform currentPlanet;
 
@@ -49,7 +49,7 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        if (isDraggingPlanet) RotateDraggedPlanet();
+        if (isDraggingPlanet) RotateAroundDraggedPlanet();
         //RotateDraggedPlanet();
     }
 
@@ -58,7 +58,7 @@ public class PlayerController : MonoBehaviour
         Zoom();
     }
 
-    private void RotateDraggedPlanet()
+    private void RotateAroundDraggedPlanet()
     {
         currentPlanet.RotateAround(Vector3.up, math.radians(-mouseMove.x * rotateSensibility));
         currentPlanet.RotateAround(Vector3.right, math.radians(mouseMove.y * rotateSensibility));
@@ -72,7 +72,12 @@ public class PlayerController : MonoBehaviour
 
     private void Zoom()
     {
-        Vector3 targetPos = -Vector3.forward * baseDistance - camera.forward * currentDistance;
+        Vector3 targetPos = currentPlanet.position - Vector3.forward * baseDistance - camera.forward * currentDistance;
         camera.position = Vector3.Lerp(camera.position, targetPos, cameraSpeed * Time.deltaTime);
+    }
+
+    public void SetNewTarget(int i)
+    {
+        currentPlanet = WorldManager.instance.GetPlanet(i);
     }
 }

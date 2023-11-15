@@ -8,7 +8,7 @@ using Unity.VisualScripting.Dependencies.Sqlite;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-public class PlanetGeneration : MonoBehaviour
+public class Planet : MonoBehaviour
 {
     public List<Vector3> vertices;
     [SerializeField] public List<Triangle> triangles = new List<Triangle>(0);
@@ -25,6 +25,8 @@ public class PlanetGeneration : MonoBehaviour
 
     public uint seed;
     public float noiseSize;
+
+    [SerializeField] private Transform waterSphere;
 
     public Noise elevationNoise;
 
@@ -60,7 +62,7 @@ public class PlanetGeneration : MonoBehaviour
 
     }
 
-    async void Start()
+    public async void Initialize()
     {
         elevationNoise = new Noise((int)seed);
 
@@ -88,7 +90,7 @@ public class PlanetGeneration : MonoBehaviour
 
         for (int i = 0; i < vertices.Count; i++)
         {
-            vertices[i] = transform.position + (vertices[i] - transform.position).normalized * size;
+            vertices[i] = vertices[i].normalized * size;
         }
 
 
@@ -167,9 +169,7 @@ public class PlanetGeneration : MonoBehaviour
         SetOrganicDisplacement();
 
         CreateAllRectangles();
-
         
-
         Mesh mesh = new Mesh();
 
 
@@ -179,6 +179,8 @@ public class PlanetGeneration : MonoBehaviour
         
         mesh.RecalculateNormals();
         filter.mesh = mesh;
+
+        waterSphere.localScale = Vector3.one * (size * 2 + heightSize * 0.5f);
     }
 
 
@@ -519,7 +521,7 @@ public class PlanetGeneration : MonoBehaviour
 
     void SetNormal(Triangle tri)
     {
-        tri.normal = (tri.centralPoint - transform.position).normalized;
+        tri.normal = tri.centralPoint.normalized;
     }
 
     void SubdivideSphere()
@@ -725,7 +727,7 @@ public class PlanetGeneration : MonoBehaviour
         }
 
         Vector3 midPoint = Vector3.Lerp(vertices[point1], vertices[point2], 0.5f);
-        midPoint = transform.position + (midPoint - transform.position).normalized * size;
+        midPoint = (midPoint).normalized * size;
         vertices.Add(midPoint);
         gridVertices.Add(new Vertex());
         midPointsDic.Add((point1, point2), vertices.Count - 1);
