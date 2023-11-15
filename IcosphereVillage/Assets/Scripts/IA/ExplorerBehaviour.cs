@@ -116,8 +116,30 @@ public class ExplorerBehaviour : MonoBehaviour
     private async Task MoveToTargetPoint(int[] reversePath)
     {
         for (int i = reversePath.Length - 1; i >= 0; i--)
-        {
+        {            
+            Triangle current = home.triangles[locationIndex];
+            Quaternion rot = explorer.rotation;
+
+            Vector3 p1, p2, p3, p4;
+            p1 = explorer.position;
+            p2 = explorer.position + current.normal;
+            
             locationIndex = reversePath[i];
+            Triangle next = home.triangles[locationIndex];
+            Quaternion nextRot = Quaternion.LookRotation(next.normal);
+            
+            p3 = explorer.position + current.normal;
+            p4 = next.centralPoint + next.normal * next.heightLevel * home.heightSize;
+
+            float timer = 0;
+            while (timer < 0.2f)
+            {
+                await Task.Yield();
+                timer += Time.deltaTime;
+                explorer.position = ExBeziers.CubicBeziersCurve(p1, p2, p3, p4, timer / 0.2f);
+                explorer.rotation = Quaternion.Slerp(rot, nextRot, timer / 0.2f);
+            }
+            
             SetPositionOnTriangle();
             await Task.Delay(100);
         }
@@ -131,7 +153,6 @@ public class ExplorerBehaviour : MonoBehaviour
         Triangle triangle = home.triangles[locationIndex];
         explorer.position = triangle.centralPoint + triangle.normal * triangle.heightLevel * home.heightSize;
         explorer.rotation = Quaternion.LookRotation(triangle.normal);
-        explorer.eulerAngles += Vector3.right * 90;
     }
 
     public int[] GetNeighbours(int index)
