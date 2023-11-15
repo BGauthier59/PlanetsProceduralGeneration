@@ -86,6 +86,10 @@ public class Planet : MonoBehaviour
 
         RandomGenerator.SetSeed(seed);
 
+        subdivisions = RandomGenerator.GetRandomValueInt(2, 4);
+        if (subdivisions == 3) size = 3;
+        else size = 1.5f;
+        
         // MAX HEIGHT DE 2 A 5
         maxHeight = RandomGenerator.GetRandomValueInt(2, 6);
 

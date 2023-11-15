@@ -8,9 +8,12 @@ public class WorldManager : MonoSingleton<WorldManager>
 {
     [SerializeField] private List<Transform> allPlanets;
     [SerializeField] private Planet planetPrefab;
+    [SerializeField] private uint globalSeed;
 
     private void Start()
     {
+        RandomGenerator.seedGeneratorSeed = globalSeed;
+        
         CreateNewPlanet(Vector3.zero);
     }
 
