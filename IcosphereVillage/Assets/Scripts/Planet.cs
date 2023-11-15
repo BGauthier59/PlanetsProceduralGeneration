@@ -204,8 +204,8 @@ public class Planet : MonoBehaviour
         SetOrganicDisplacement();
 
         CreateTreesAndRocks();
-        SetHangar(out int hangarIndex);
-        CreateFirstExplorers(hangarIndex);
+        SetHangar();
+        CreateFirstExplorers();
 
         CreateAllRectangles();
 
@@ -223,6 +223,8 @@ public class Planet : MonoBehaviour
 
         mesh.RecalculateNormals();
         filter.mesh = mesh;
+
+        GetComponent<MeshCollider>().sharedMesh = mesh;
     }
 
     #region Elevation
@@ -230,15 +232,21 @@ public class Planet : MonoBehaviour
     void SetElevationGrouped()
     {
         Vector3 triPos;
+        bool first = true;
 
         foreach (var tri in triangles)
         {
             triPos = tri.centralPoint;
             triPos *= noiseSize;
             float v = (elevationNoise.Evaluate(triPos) + 1) * 0.5f;
-            
-            tri.heightLevel = (int)(v * (maxHeight + 1));
 
+            if (first)
+            {
+                first = false;
+                tri.heightLevel = waterLevel;
+            }
+            else tri.heightLevel = (int)(v * (maxHeight + 1));
+            
             for (int i = 0; i < tri.heightLevel; i++)
             {
                 tri.elevationTriangle.Add(Vector3Int.zero);
@@ -823,36 +831,17 @@ public class Planet : MonoBehaviour
         }
     }
 
-    void SetHangar(out int hangarIndex)
+    void SetHangar()
     {
-        hangarIndex = 0;
-        Triangle triangle = null;
-        for (int i = 0; i < triangles.Count; i++)
-        {
-            if (triangles[i].heightLevel >= waterLevel && triangles[triangles[i].neighbourA].heightLevel == triangles[i].heightLevel
-                                                       && triangles[triangles[i].neighbourB].heightLevel == triangles[i].heightLevel
-                                                       && triangles[triangles[i].neighbourC].heightLevel == triangles[i].heightLevel)
-            {
-                triangle = triangles[i];
-                hangarIndex = i;
-                break;
-            }
-        }
-
-        if (triangle == null)
-        {
-            triangle = triangles[0];
-        }
-        
+        Triangle triangle = triangles[0];
         hangar.localPosition = triangle.centralPoint + triangle.normal * triangle.heightLevel * heightSize;
         hangar.localRotation = Quaternion.LookRotation(triangle.normal);
-        
     }
 
-    void CreateFirstExplorers(int tri)
+    void CreateFirstExplorers()
     {
-        explorer1.Initialize(this, triangles[tri].neighbourA);
-        explorer2.Initialize(this, triangles[tri].neighbourB);
+        explorer1.Initialize(this, 0);
+        explorer2.Initialize(this, 0);
     }
 
     #endregion
@@ -926,6 +915,7 @@ public class Planet : MonoBehaviour
 
     private void OnDrawGizmos()
     {
+        return;
         foreach (var v in vertices)
         {
             Gizmos.color = Color.blue;
