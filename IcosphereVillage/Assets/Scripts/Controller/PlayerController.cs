@@ -293,8 +293,19 @@ public class PlayerController : MonoSingleton<PlayerController>
         }
         else
         {
+            if (currentPlanet.triangles[currentTriangleIndex].treeLevel > 0)
+            {
+                selectedExplorer.taskTriangle = currentTriangleIndex;
+                selectedExplorer.ChangeTask(ExplorerTask.Recolting);
+            }
+            else
+            {
+                selectedExplorer.ChangeTask(ExplorerTask.None);
+            }
+            
             selectedExplorer.TargetTile(currentTriangleIndex);
             UnSelectExplorer();
+            
         }
     }
 
