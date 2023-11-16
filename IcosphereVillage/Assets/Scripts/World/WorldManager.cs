@@ -36,17 +36,65 @@ public class WorldManager : MonoSingleton<WorldManager>
         return allExplorers[index];
     }
 
-    public async Task CreateNewPlanet(Vector3 position)
+    public async void LaunchAircraft(Planet planet, int index)
+    {
+        Debug.Log("Launched aicraft of " + planet +  "on tile " + index);
+        
+        Transform rocket = planet.rocketByIndex[index];
+        PlayerController.instance.SetZoomOnRocket(rocket);
+        
+        rocket.SetParent(null);
+        
+        Vector3 nextPlanetPosition = new Vector3(50, 50, 50);
+
+        Planet newPlanet = await CreateNewPlanet(nextPlanetPosition);
+        
+        Triangle start = planet.triangles[index];
+        Triangle end = newPlanet.triangles[newPlanet.hangarIndex];
+
+        Vector3 p1, p2, p3, p4;
+
+        p1 = rocket.position;
+        p2 = rocket.position + start.elevationNormal * 30;
+        p3 = newPlanet.transform.TransformPoint(end.centralPoint)
+             + newPlanet.transform.TransformDirection(end.elevationNormal * 30);
+        p4 = newPlanet.transform.TransformPoint(end.centralPoint);
+
+        float timer = 0;
+        while (timer < 5)
+        {
+            timer += Time.deltaTime;
+            await Task.Yield();
+            rocket.position = ExBeziers.CubicBeziersCurve(p1, p2, p3, p4, timer / 5);
+        }
+        
+        planet.rocketByIndex.Remove(index);
+        start.building = Building.None;
+        rocket.gameObject.SetActive(false);
+        
+        PlayerController.instance.ExitRocketZoom();
+        PlayerController.instance.SetCurrentPlanet(newPlanet);
+    }
+
+    public async Task<Planet> CreateNewPlanet(Vector3 position)
     {
         var p = Instantiate(planetPrefab, position, Quaternion.identity);
         await p.Initialize();
         allPlanets.Add(p);
         UIManager.instance.AddPlanetGui(allPlanets.Count - 1);
+
+        return p;
     }
 
     public void DEBUG_CreatePlanet()
     {
         Vector3 rng = new Vector3(Random.Range(-50, 50), Random.Range(-50, 50), Random.Range(-50, 50));
         CreateNewPlanet(rng);
+    }
+
+    public int DEBUG_RocketPos;
+    public void DEBUG_CreateRocket()
+    {
+        allPlanets[0].CreateBuilding(DEBUG_RocketPos, Building.Rocket);
     }
 }

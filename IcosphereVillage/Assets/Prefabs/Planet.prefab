@@ -272,6 +272,7 @@ MonoBehaviour:
   vertexColors: []
   hangar: {fileID: 3565732001923508630, guid: 0aebb486f11dd2d49b7006220e15e7e3, type: 3}
   house: {fileID: 3565732001923508630, guid: 959ecf4f7b22e4c4a9c827cabe34b6e7, type: 3}
+  rocket: {fileID: 8771618361602881056, guid: cf8eb7d3d4996654a9456ddf9d339eeb, type: 3}
   explorer1: {fileID: 1974642023368158110}
   explorer2: {fileID: 3943040686702049936}
   biomes:

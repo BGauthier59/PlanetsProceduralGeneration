@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -27,36 +28,51 @@ public class PlayerController : MonoSingleton<PlayerController>
     private Vector2 scroll;
 
     // Explorer Selection
-    public Color selectedColor;
-    public Color unselectedColor;
     public Sprite[] actionSprites;
-    
+
+    // Rocket
+    [SerializeField] private float holdDuration;
+    private bool isHolding;
+    private bool isZoomingRocket;
+    private Transform rocket;
+
     public void Initialize(Planet target)
     {
-        currentPlanet = target;
+        SetCurrentPlanet(target);
         currentDistance = baseDistance;
         cam = camera.GetComponent<Camera>();
         currentTriangle = null;
         isActive = true;
     }
 
+    public void SetCurrentPlanet(Planet p)
+    {
+        currentPlanet = p;
+    }
+
+    private bool IsReadingInput()
+    {
+        if (!isActive || isZoomingRocket) return false;
+        return true;
+    }
+
     public void OnRotate(InputAction.CallbackContext ctx)
     {
-        if (!isActive) return;
+        if (!IsReadingInput()) return;
         if (!ctx.performed) return;
         mouseMove = ctx.ReadValue<Vector2>();
     }
 
     public void OnDragPlanet(InputAction.CallbackContext ctx)
     {
-        if (!isActive) return;
+        if (!IsReadingInput()) return;
         if (ctx.started) isDraggingPlanet = true;
         else if (ctx.canceled) isDraggingPlanet = false;
     }
 
     public void OnScroll(InputAction.CallbackContext ctx)
     {
-        if (!isActive) return;
+        if (!IsReadingInput()) return;
         if (!ctx.performed) return;
         scroll = ctx.ReadValue<Vector2>();
         SetDistance(-scroll.y);
@@ -64,8 +80,10 @@ public class PlayerController : MonoSingleton<PlayerController>
 
     public void OnClick(InputAction.CallbackContext ctx)
     {
-        if (!isActive) return;
+        if (!IsReadingInput()) return;
+        if (ctx.canceled) isHolding = false;
         if (!ctx.performed) return;
+        isHolding = true;
         ClickOnTile();
     }
 
@@ -97,9 +115,30 @@ public class PlayerController : MonoSingleton<PlayerController>
 
     private void Zoom()
     {
-        Vector3 targetPos = currentPlanet.transform.position - Vector3.forward * baseDistance -
-                            camera.forward * currentDistance;
+        Vector3 targetPos;
+        if (isZoomingRocket)
+        {
+            targetPos = rocket.position - Vector3.forward * baseDistance;
+        }
+        else
+        {
+            targetPos = currentPlanet.transform.position - Vector3.forward * baseDistance -
+                        camera.forward * currentDistance;
+        }
+
         camera.position = Vector3.Lerp(camera.position, targetPos, cameraSpeed * Time.deltaTime);
+    }
+
+    public void SetZoomOnRocket(Transform target)
+    {
+        isZoomingRocket = true;
+        rocket = target;
+    }
+
+    public void ExitRocketZoom()
+    {
+        isZoomingRocket = false;
+        rocket = null;
     }
 
     public void SetNewTarget(int i)
@@ -109,7 +148,6 @@ public class PlayerController : MonoSingleton<PlayerController>
 
     public int currentTriangleIndex = -1;
     public Triangle currentTriangle;
-    public Transform cursor;
     public MeshFilter cursorFilter;
     private Mesh cursorMesh;
     public ExplorerBehaviour selectedExplorer;
@@ -137,7 +175,7 @@ public class PlayerController : MonoSingleton<PlayerController>
                 return;
             }
         }
-        
+
         SetNoTriangle();
     }
 
@@ -151,7 +189,7 @@ public class PlayerController : MonoSingleton<PlayerController>
     {
         Vector3 recalculatedNormal = (currentPlanet.transform.TransformDirection(triangle.elevationNormal));
         Vector3 recalculatedCenter = currentPlanet.transform.TransformPoint(currentPlanet.GetTriangleCenterPoint(i));
- 
+
         bool dotTest = math.dot(normal, recalculatedNormal) >= 0.999;
         if (dotTest) return true;
         return false;
@@ -210,9 +248,41 @@ public class PlayerController : MonoSingleton<PlayerController>
         cursorFilter.mesh = cursorMesh;
     }
 
-    private void ClickOnTile()
+    private async void ClickOnTile()
     {
         if (currentTriangle == null || currentPlanet == null) return;
+
+        switch (currentTriangle.building)
+        {
+            case Building.House:
+                break;
+            case Building.Hangar:
+                break;
+            case Building.Rocket:
+
+                int saveIndex = currentTriangleIndex;
+                float holdTimer = 0;
+                while (holdTimer < holdDuration)
+                {
+                    holdTimer += Time.deltaTime;
+                    await Task.Yield();
+                    if (!isHolding)
+                    {
+                        Debug.Log("stop holding");
+                        return;
+                    }
+                }
+
+                WorldManager.instance.LaunchAircraft(currentPlanet, saveIndex);
+                return;
+
+            case Building.Bridge:
+                break;
+            case Building.None:
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
 
         if (selectedExplorer == null)
         {

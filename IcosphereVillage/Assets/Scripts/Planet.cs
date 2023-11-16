@@ -20,7 +20,7 @@ public class Planet : MonoBehaviour
     public MeshRenderer planetRenderer;
     public MeshRenderer waterRenderer;
 
-    public int ressourceType1,ressourceType2;
+    public int ressourceType1, ressourceType2;
     public Transform treeParent;
     public Transform buildingsParent;
 
@@ -46,20 +46,20 @@ public class Planet : MonoBehaviour
 
     public List<Color> vertexColors = new List<Color>();
 
-    [SerializeField] private GameObject hangar,house,rocket;
+    [SerializeField] private GameObject hangar, house, rocket;
     [SerializeField] private ExplorerBehaviour explorer1, explorer2;
+    public Dictionary<int, Transform> rocketByIndex = new Dictionary<int, Transform>();
+    public int hangarIndex;
 
-    [Header("BIOME")] 
-    [SerializeField] private BiomeSO[] biomes;
+    [Header("BIOME")] [SerializeField] private BiomeSO[] biomes;
     public BiomeSO biome;
-    
+
     private void OnValidate()
     {
     }
 
     private void Update()
     {
-
         /*
         foreach (var tri in subdividedTris)
         {
@@ -97,7 +97,7 @@ public class Planet : MonoBehaviour
         subdivisions = RandomGenerator.GetRandomValueInt(2, 4);
         if (subdivisions == 3) size = 4f;
         else size = 1f;
-        
+
         // MAX HEIGHT DE 2 A 5
         maxHeight = RandomGenerator.GetRandomValueInt(2, 6);
 
@@ -107,14 +107,15 @@ public class Planet : MonoBehaviour
 
         // SET DU BIOME
         biome = biomes[RandomGenerator.GetRandomValueInt(0, biomes.Length)];
-        
-        planetRenderer.material.SetColor("_BottomColor",biome.bottomColor);
-        planetRenderer.material.SetColor("_TopColor",biome.topColor);
-        planetRenderer.material.SetColor("_GroundColor",biome.groundColor);
+
+        planetRenderer.material.SetColor("_BottomColor", biome.bottomColor);
+        planetRenderer.material.SetColor("_TopColor", biome.topColor);
+        planetRenderer.material.SetColor("_GroundColor", biome.groundColor);
         planetRenderer.material.SetFloat("_heightMax", maxHeight);
         planetRenderer.material.SetFloat("_GroundLevel", waterLevel);
 
-        waterRenderer.material = biome.waterMaterials[RandomGenerator.GetRandomValueInt(0, biome.waterMaterials.Length)];
+        waterRenderer.material =
+            biome.waterMaterials[RandomGenerator.GetRandomValueInt(0, biome.waterMaterials.Length)];
 
         if (biome.ressources.Length <= 2)
         {
@@ -124,9 +125,9 @@ public class Planet : MonoBehaviour
         else
         {
             ressourceType1 = RandomGenerator.GetRandomValueInt(0, biome.ressources.Length);
-        
+
             ressourceType2 = RandomGenerator.GetRandomValueInt(0, biome.ressources.Length);
-            if (ressourceType2 == ressourceType1) ressourceType2 = (ressourceType2 + 1) % biome.ressources.Length;   
+            if (ressourceType2 == ressourceType1) ressourceType2 = (ressourceType2 + 1) % biome.ressources.Length;
         }
 
         // GENERATION DU MESH
@@ -232,7 +233,7 @@ public class Planet : MonoBehaviour
         SetOrganicDisplacement();
 
         CreateTreesAndRocks();
-        SetHangar(out int hangarIndex);
+        SetHangar(out hangarIndex);
         CreateFirstExplorers(hangarIndex);
 
 
@@ -268,9 +269,9 @@ public class Planet : MonoBehaviour
             triPos *= noiseSize;
             float v = (elevationNoise.Evaluate(triPos) + 1) * 0.5f;
 
-            
+
             tri.heightLevel = (int)(v * (maxHeight + 1));
-            
+
             for (int i = 0; i < tri.heightLevel; i++)
             {
                 tri.elevationTriangle.Add(Vector3Int.zero);
@@ -561,7 +562,7 @@ public class Planet : MonoBehaviour
             tri.elevationNormal = tri.normal;
             return;
         }
-        
+
         Vector3Int elevationTriangle = tri.elevationTriangle[^1];
 
         Vector3 x = vertices[elevationTriangle.x];
@@ -867,22 +868,25 @@ public class Planet : MonoBehaviour
                         ;
                     }
 
-                    int prefab = RandomGenerator.GetRandomValue() > (ressourceNoise.Evaluate(triPos) + 1.2f) * 0.3f ? 
-                        ressourceType1 : ressourceType2;
-                    
-                    GameObject newTree = Instantiate(biome.ressources[prefab].prefab, treePos + transform.position, Quaternion.LookRotation(
-                        triangles[i].normal +
-                        new Vector3(RandomGenerator.GetRandomValueInRange(-0.1f, 0.1f),
-                            RandomGenerator.GetRandomValueInRange(-0.1f, 0.1f),
-                            RandomGenerator.GetRandomValueInRange(-0.1f, 0.1f))), treeParent);
+                    int prefab = RandomGenerator.GetRandomValue() > (ressourceNoise.Evaluate(triPos) + 1.2f) * 0.3f
+                        ? ressourceType1
+                        : ressourceType2;
+
+                    GameObject newTree = Instantiate(biome.ressources[prefab].prefab, treePos + transform.position,
+                        Quaternion.LookRotation(
+                            triangles[i].normal +
+                            new Vector3(RandomGenerator.GetRandomValueInRange(-0.1f, 0.1f),
+                                RandomGenerator.GetRandomValueInRange(-0.1f, 0.1f),
+                                RandomGenerator.GetRandomValueInRange(-0.1f, 0.1f))), treeParent);
 
                     newTree.transform.localScale = newTree.transform.localScale *
                                                    RandomGenerator.GetRandomValueInRange(0.9f, 1.1f);
-                    newTree.transform.Rotate(0,0,RandomGenerator.GetRandomValueInRange(0, 360));
-                    
+                    newTree.transform.Rotate(0, 0, RandomGenerator.GetRandomValueInRange(0, 360));
+
                     MeshRenderer treeRenderer = newTree.GetComponent<MeshRenderer>();
                     Material[] treeMats = treeRenderer.materials;
-                    treeMats[biome.ressources[prefab].materialIndex] = new Material(treeMats[biome.ressources[prefab].materialIndex]);
+                    treeMats[biome.ressources[prefab].materialIndex] =
+                        new Material(treeMats[biome.ressources[prefab].materialIndex]);
                     treeMats[biome.ressources[prefab].materialIndex].color = biome.ressources[prefab].colorGradient
                         .Evaluate((colorNoise.Evaluate(triPos) + 1f) * 0.5f);
                     treeRenderer.materials = treeMats;
@@ -897,14 +901,17 @@ public class Planet : MonoBehaviour
         Triangle triangle = null;
         for (int i = 0; i < triangles.Count; i++)
         {
-            if (triangles[i].heightLevel >= waterLevel && triangles[triangles[i].neighbourA].heightLevel == triangles[i].heightLevel
-                                                       && triangles[triangles[i].neighbourB].heightLevel == triangles[i].heightLevel
-                                                       && triangles[triangles[i].neighbourC].heightLevel == triangles[i].heightLevel
+            if (triangles[i].heightLevel >= waterLevel && triangles[triangles[i].neighbourA].heightLevel ==
+                                                       triangles[i].heightLevel
+                                                       && triangles[triangles[i].neighbourB].heightLevel ==
+                                                       triangles[i].heightLevel
+                                                       && triangles[triangles[i].neighbourC].heightLevel ==
+                                                       triangles[i].heightLevel
                                                        && triangles[i].treeLevel == 0
                                                        && triangles[triangles[i].neighbourA].treeLevel == 0
                                                        && triangles[triangles[i].neighbourB].treeLevel == 0
                                                        && triangles[triangles[i].neighbourC].treeLevel == 0
-                                                       )
+               )
             {
                 triangle = triangles[i];
                 hangarIndex = i;
@@ -920,10 +927,10 @@ public class Planet : MonoBehaviour
         Vector3 pos = GetTriangleCenterPoint(hangarIndex);
 
         triangle.building = Building.Hangar;
-        Transform tr = Instantiate(hangar, Vector3.zero, Quaternion.LookRotation(triangle.normal),buildingsParent).transform;
+        Transform tr = Instantiate(hangar, Vector3.zero, Quaternion.LookRotation(triangle.normal), buildingsParent)
+            .transform;
 
         tr.localPosition = pos;
-
     }
 
     void CreateFirstExplorers(int tri)
@@ -933,8 +940,8 @@ public class Planet : MonoBehaviour
         explorer2.Initialize(this, triangles[tri].neighbourB);
 
         triangles[triangles[tri].neighbourC].building = Building.House;
-        Transform tr = Instantiate(house, Vector3.zero, 
-            Quaternion.LookRotation(triangles[triangles[tri].neighbourC].normal),buildingsParent).transform;
+        Transform tr = Instantiate(house, Vector3.zero,
+            Quaternion.LookRotation(triangles[triangles[tri].neighbourC].normal), buildingsParent).transform;
         tr.localPosition = GetTriangleCenterPoint(triangles[tri].neighbourC);
     }
 
@@ -1027,19 +1034,19 @@ public class Planet : MonoBehaviour
     {
         if (triangles[index].building == Building.Bridge)
         {
-            return triangles[index].centralPoint + triangles[index].normal * triangles[index].heightLevel * heightSize;
+            return triangles[index].centralPoint +
+                   triangles[index].normal * (triangles[index].heightLevel * heightSize);
         }
-        
+
         if (triangles[index].heightLevel == 0)
         {
             return triangles[index].centralPoint;
         }
-        
+
         return (vertices[triangles[index].elevationTriangle[triangles[index].heightLevel - 1].x] +
-                vertices[triangles[index].elevationTriangle[triangles[index].heightLevel - 1].y] + 
+                vertices[triangles[index].elevationTriangle[triangles[index].heightLevel - 1].y] +
                 vertices[triangles[index].elevationTriangle[triangles[index].heightLevel - 1].z]) /
-                3;
-        
+               3;
     }
 
     void CreateWaterPlatform(int index)
@@ -1051,12 +1058,13 @@ public class Planet : MonoBehaviour
         Transform tr = Instantiate(biome.waterPlatform, Vector3.zero, Quaternion.LookRotation(triangles[index].normal),
             buildingsParent).transform;
         tr.localPosition = GetTriangleCenterPoint(index) - triangles[index].normal * 0.2f * heightSize;
-        tr.transform.Rotate(0,0,RandomGenerator.GetRandomValueInRange(0, 360));
+        tr.transform.Rotate(0, 0, RandomGenerator.GetRandomValueInRange(0, 360));
     }
-    
-    void CreateBuilding(int index,Building building)
+
+    public void CreateBuilding(int index, Building building)
     {
-        if (triangles[index].heightLevel < waterLevel || triangles[index].building != Building.None || triangles[index].treeLevel > 0) return;
+        if (triangles[index].heightLevel < waterLevel || triangles[index].building != Building.None ||
+            triangles[index].treeLevel > 0) return;
 
         triangles[index].building = building;
 
@@ -1066,11 +1074,16 @@ public class Planet : MonoBehaviour
             Building.Hangar => hangar,
             Building.Rocket => rocket,
         };
-        
+
         Transform tr = Instantiate(prefab, Vector3.zero, Quaternion.LookRotation(triangles[index].normal),
             buildingsParent).transform;
         tr.localPosition = GetTriangleCenterPoint(index);
-        tr.transform.Rotate(0,0,RandomGenerator.GetRandomValueInRange(0, 360));
+        tr.transform.Rotate(0, 0, RandomGenerator.GetRandomValueInRange(0, 360));
+
+        if (building == Building.Rocket)
+        {
+            rocketByIndex.Add(index, tr);
+        }
     }
 }
 
