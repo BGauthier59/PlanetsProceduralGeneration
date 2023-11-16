@@ -59,12 +59,7 @@ public class Planet : MonoBehaviour
 
     private void Update()
     {
-        for (int i = 0; i < triangles.Count; i++)
-        {
-            Debug.DrawRay(GetTriangleCenterPoint(i), triangles[i].elevationNormal, Color.magenta);
 
-        }
-        
         /*
         foreach (var tri in subdividedTris)
         {
@@ -1034,7 +1029,7 @@ public class Planet : MonoBehaviour
         }
     }
 
-    Vector3 GetTriangleCenterPoint(int index)
+    public Vector3 GetTriangleCenterPoint(int index)
     {
         if (triangles[index].building == Building.Bridge)
         {

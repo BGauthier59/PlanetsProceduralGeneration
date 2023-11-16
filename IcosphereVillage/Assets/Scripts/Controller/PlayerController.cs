@@ -116,7 +116,11 @@ public class PlayerController : MonoSingleton<PlayerController>
     public void DetectCurrentTriangle()
     {
         var ray = cam.ScreenPointToRay(Input.mousePosition);
-        if (!Physics.Raycast(ray.origin, ray.direction, out var hit, 100)) return;
+        if (!Physics.Raycast(ray.origin, ray.direction, out var hit, 100))
+        {
+            SetNoTriangle();
+            return;
+        }
 
         //cursor.position = hit.point;
 
@@ -124,34 +128,30 @@ public class PlayerController : MonoSingleton<PlayerController>
         for (int i = 0; i < currentPlanet.triangles.Count; i++)
         {
             triangle = currentPlanet.triangles[i];
-            if (IsCursorOverTriangle(triangle, hit.normal, hit.point))
+            if (IsCursorOverTriangle(triangle, hit.normal, hit.point, i))
             {
                 currentTriangle = triangle;
                 currentTriangleIndex = i;
-                cursor.position = currentPlanet.transform.TransformPoint(Vector3.zero);
+                //cursor.position = currentPlanet.transform.TransformPoint(Vector3.zero);
                 return;
             }
         }
         
+        SetNoTriangle();
+    }
+
+    private void SetNoTriangle()
+    {
         currentTriangle = null;
         currentTriangleIndex = -1;
     }
 
-    public bool IsCursorOverTriangle(Triangle triangle, Vector3 normal, Vector3 point)
+    public bool IsCursorOverTriangle(Triangle triangle, Vector3 normal, Vector3 point, int i)
     {
-        Vector3 recalculatedNormal = currentPlanet.transform.TransformPoint(triangle.elevationNormal);
-        Vector3 recalculatedCenter = currentPlanet.transform.
-            TransformPoint(triangle.centralPoint + triangle.normal * triangle.heightLevel);
-
+        Vector3 recalculatedNormal = (currentPlanet.transform.TransformDirection(triangle.elevationNormal));
+        Vector3 recalculatedCenter = currentPlanet.transform.TransformPoint(currentPlanet.GetTriangleCenterPoint(i));
+ 
         bool dotTest = math.dot(normal, recalculatedNormal) >= 0.999;
-        bool distanceTest = Vector3.Distance(recalculatedCenter, point) < 1;
-
-        if (distanceTest)
-        {
-            Debug.DrawLine(point, currentPlanet.transform.
-                TransformPoint(triangle.centralPoint), Color.red);
-        }
-        
         if (dotTest) return true;
         return false;
     }
@@ -191,9 +191,9 @@ public class PlayerController : MonoSingleton<PlayerController>
                 currentPlanet.vertices[currentTriangle.elevationTriangle[^1].z]);
         }
 
-        v1 += currentPlanet.transform.TransformPoint(currentTriangle.elevationNormal * 0.1f);
-        v2 += currentPlanet.transform.TransformPoint(currentTriangle.elevationNormal * 0.1f);
-        v3 += currentPlanet.transform.TransformPoint(currentTriangle.elevationNormal * 0.1f);
+        v1 += currentPlanet.transform.TransformDirection(currentTriangle.elevationNormal * 0.01f);
+        v2 += currentPlanet.transform.TransformDirection(currentTriangle.elevationNormal * 0.01f);
+        v3 += currentPlanet.transform.TransformDirection(currentTriangle.elevationNormal * 0.01f);
 
         Vector3[] vertices = new Vector3[]
         {
