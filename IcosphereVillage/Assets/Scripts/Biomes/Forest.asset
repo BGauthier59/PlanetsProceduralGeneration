@@ -1,0 +1,122 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a145b00af5db0d343b1730604b5de1f9, type: 3}
+  m_Name: Forest
+  m_EditorClassIdentifier: 
+  topColor: {r: 0.21176471, g: 0.6313726, b: 0.2784314, a: 0}
+  groundColor: {r: 0.67058825, g: 1, b: 0.10980392, a: 0}
+  bottomColor: {r: 0.2627451, g: 0.2627451, b: 0.2627451, a: 0}
+  waterMaterials:
+  - {fileID: 2100000, guid: 6d4eaef20b799a9469e3d8bae1e57049, type: 2}
+  - {fileID: 2100000, guid: c145928709a1a9e43a4f30bd7975df85, type: 2}
+  - {fileID: 2100000, guid: c4614291955ed21449dea0b421b68769, type: 2}
+  - {fileID: 2100000, guid: 3db461285d45f4742a836073b68d2559, type: 2}
+  - {fileID: 2100000, guid: 474a49f54a2c09340871ea8de761ee41, type: 2}
+  - {fileID: 2100000, guid: 18893de600d4ccc4791c1b864ee6be45, type: 2}
+  ressources:
+  - prefab: {fileID: 222292335441431702, guid: 44a0a12a18f3d534da87600e9f20aae8, type: 3}
+    colorGradient:
+      serializedVersion: 2
+      key0: {r: 0.32032895, g: 0.6981132, b: 0.28648987, a: 1}
+      key1: {r: 0.11160554, g: 0.41509432, b: 0.16425152, a: 1}
+      key2: {r: 0, g: 0, b: 0, a: 0}
+      key3: {r: 0, g: 0, b: 0, a: 0}
+      key4: {r: 0, g: 0, b: 0, a: 0}
+      key5: {r: 0, g: 0, b: 0, a: 0}
+      key6: {r: 0, g: 0, b: 0, a: 0}
+      key7: {r: 0, g: 0, b: 0, a: 0}
+      ctime0: 0
+      ctime1: 65535
+      ctime2: 0
+      ctime3: 0
+      ctime4: 0
+      ctime5: 0
+      ctime6: 0
+      ctime7: 0
+      atime0: 0
+      atime1: 65535
+      atime2: 0
+      atime3: 0
+      atime4: 0
+      atime5: 0
+      atime6: 0
+      atime7: 0
+      m_Mode: 0
+      m_ColorSpace: -1
+      m_NumColorKeys: 2
+      m_NumAlphaKeys: 2
+    materialIndex: 0
+  - prefab: {fileID: 603484951750611027, guid: 9b83d9d41403c8148adae34efb9bb9da, type: 3}
+    colorGradient:
+      serializedVersion: 2
+      key0: {r: 0.627105, g: 1, b: 0.5058824, a: 1}
+      key1: {r: 0.259408, g: 0.77254903, b: 0, a: 1}
+      key2: {r: 0, g: 0, b: 0, a: 0}
+      key3: {r: 0, g: 0, b: 0, a: 0}
+      key4: {r: 0, g: 0, b: 0, a: 0}
+      key5: {r: 0, g: 0, b: 0, a: 0}
+      key6: {r: 0, g: 0, b: 0, a: 0}
+      key7: {r: 0, g: 0, b: 0, a: 0}
+      ctime0: 0
+      ctime1: 65535
+      ctime2: 0
+      ctime3: 0
+      ctime4: 0
+      ctime5: 0
+      ctime6: 0
+      ctime7: 0
+      atime0: 0
+      atime1: 65535
+      atime2: 0
+      atime3: 0
+      atime4: 0
+      atime5: 0
+      atime6: 0
+      atime7: 0
+      m_Mode: 0
+      m_ColorSpace: -1
+      m_NumColorKeys: 2
+      m_NumAlphaKeys: 2
+    materialIndex: 0
+  - prefab: {fileID: 4652012513371220071, guid: 66af31db6f211794b869caf5fa324ba7,
+      type: 3}
+    colorGradient:
+      serializedVersion: 2
+      key0: {r: 0.8867924, g: 0.1916859, b: 0.17150229, a: 1}
+      key1: {r: 1, g: 0.6023743, b: 0.3443396, a: 1}
+      key2: {r: 0, g: 0, b: 0, a: 0}
+      key3: {r: 0, g: 0, b: 0, a: 0}
+      key4: {r: 0, g: 0, b: 0, a: 0}
+      key5: {r: 0, g: 0, b: 0, a: 0}
+      key6: {r: 0, g: 0, b: 0, a: 0}
+      key7: {r: 0, g: 0, b: 0, a: 0}
+      ctime0: 0
+      ctime1: 65535
+      ctime2: 0
+      ctime3: 0
+      ctime4: 0
+      ctime5: 0
+      ctime6: 0
+      ctime7: 0
+      atime0: 0
+      atime1: 65535
+      atime2: 0
+      atime3: 0
+      atime4: 0
+      atime5: 0
+      atime6: 0
+      atime7: 0
+      m_Mode: 0
+      m_ColorSpace: -1
+      m_NumColorKeys: 2
+      m_NumAlphaKeys: 2
+    materialIndex: 2

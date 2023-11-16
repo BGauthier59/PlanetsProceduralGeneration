@@ -1,0 +1,119 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a145b00af5db0d343b1730604b5de1f9, type: 3}
+  m_Name: Glacier
+  m_EditorClassIdentifier: 
+  topColor: {r: 0.4862745, g: 0.9607843, b: 0.9490196, a: 0}
+  groundColor: {r: 1, g: 1, b: 1, a: 0}
+  bottomColor: {r: 0.11764706, g: 0.4509804, b: 1, a: 0}
+  waterMaterials:
+  - {fileID: 2100000, guid: 6d4eaef20b799a9469e3d8bae1e57049, type: 2}
+  - {fileID: 2100000, guid: 3db461285d45f4742a836073b68d2559, type: 2}
+  - {fileID: 2100000, guid: 18893de600d4ccc4791c1b864ee6be45, type: 2}
+  - {fileID: 2100000, guid: c145928709a1a9e43a4f30bd7975df85, type: 2}
+  - {fileID: 2100000, guid: 474a49f54a2c09340871ea8de761ee41, type: 2}
+  - {fileID: 2100000, guid: 12f3167f5b0012c44a770e041d142310, type: 2}
+  ressources:
+  - prefab: {fileID: 222292335441431702, guid: 44a0a12a18f3d534da87600e9f20aae8, type: 3}
+    colorGradient:
+      serializedVersion: 2
+      key0: {r: 0.32032895, g: 0.6981132, b: 0.28648987, a: 1}
+      key1: {r: 0.11160554, g: 0.41509432, b: 0.16425152, a: 1}
+      key2: {r: 0, g: 0, b: 0, a: 0}
+      key3: {r: 0, g: 0, b: 0, a: 0}
+      key4: {r: 0, g: 0, b: 0, a: 0}
+      key5: {r: 0, g: 0, b: 0, a: 0}
+      key6: {r: 0, g: 0, b: 0, a: 0}
+      key7: {r: 0, g: 0, b: 0, a: 0}
+      ctime0: 0
+      ctime1: 65535
+      ctime2: 0
+      ctime3: 0
+      ctime4: 0
+      ctime5: 0
+      ctime6: 0
+      ctime7: 0
+      atime0: 0
+      atime1: 65535
+      atime2: 0
+      atime3: 0
+      atime4: 0
+      atime5: 0
+      atime6: 0
+      atime7: 0
+      m_Mode: 0
+      m_ColorSpace: -1
+      m_NumColorKeys: 2
+      m_NumAlphaKeys: 2
+  - prefab: {fileID: 222292335441431702, guid: 44a0a12a18f3d534da87600e9f20aae8, type: 3}
+    colorGradient:
+      serializedVersion: 2
+      key0: {r: 1, g: 1, b: 1, a: 1}
+      key1: {r: 0.7122642, g: 0.9714543, b: 1, a: 1}
+      key2: {r: 0, g: 0, b: 0, a: 0}
+      key3: {r: 0, g: 0, b: 0, a: 0}
+      key4: {r: 0, g: 0, b: 0, a: 0}
+      key5: {r: 0, g: 0, b: 0, a: 0}
+      key6: {r: 0, g: 0, b: 0, a: 0}
+      key7: {r: 0, g: 0, b: 0, a: 0}
+      ctime0: 0
+      ctime1: 65535
+      ctime2: 0
+      ctime3: 0
+      ctime4: 0
+      ctime5: 0
+      ctime6: 0
+      ctime7: 0
+      atime0: 0
+      atime1: 65535
+      atime2: 0
+      atime3: 0
+      atime4: 0
+      atime5: 0
+      atime6: 0
+      atime7: 0
+      m_Mode: 0
+      m_ColorSpace: -1
+      m_NumColorKeys: 2
+      m_NumAlphaKeys: 2
+  - prefab: {fileID: 4002803810739089375, guid: 3a4b18a6f2e79cc4e8d0518e0324b7fd,
+      type: 3}
+    colorGradient:
+      serializedVersion: 2
+      key0: {r: 0.4862745, g: 0.9607843, b: 0.9490196, a: 1}
+      key1: {r: 0.8726415, g: 1, b: 0.9968423, a: 1}
+      key2: {r: 0, g: 0, b: 0, a: 0}
+      key3: {r: 0, g: 0, b: 0, a: 0}
+      key4: {r: 0, g: 0, b: 0, a: 0}
+      key5: {r: 0, g: 0, b: 0, a: 0}
+      key6: {r: 0, g: 0, b: 0, a: 0}
+      key7: {r: 0, g: 0, b: 0, a: 0}
+      ctime0: 0
+      ctime1: 65535
+      ctime2: 0
+      ctime3: 0
+      ctime4: 0
+      ctime5: 0
+      ctime6: 0
+      ctime7: 0
+      atime0: 0
+      atime1: 65535
+      atime2: 0
+      atime3: 0
+      atime4: 0
+      atime5: 0
+      atime6: 0
+      atime7: 0
+      m_Mode: 0
+      m_ColorSpace: -1
+      m_NumColorKeys: 2
+      m_NumAlphaKeys: 2

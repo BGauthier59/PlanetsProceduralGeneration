@@ -224,23 +224,8 @@ MonoBehaviour:
   filter: {fileID: 2430389131594545572}
   planetRenderer: {fileID: 8397276476116871114}
   waterRenderer: {fileID: 5481901173523360710}
-  stratsMats:
-  - {fileID: 2100000, guid: 369adf5e1154d4b4f8154b4279d72485, type: 2}
-  - {fileID: 2100000, guid: 10c6e13fd7d13264291e78c6795cdf7a, type: 2}
-  - {fileID: 2100000, guid: 4cd0a074860843f4eb57d4cec27de4e5, type: 2}
-  - {fileID: 2100000, guid: c680b2ba9f9319444af06930372fe4ac, type: 2}
-  - {fileID: 2100000, guid: 7fd6f1fd8fd9ec5479e3bd367c16ddeb, type: 2}
-  - {fileID: 2100000, guid: bd1360e476c952343921af0ea13f76dd, type: 2}
-  - {fileID: 2100000, guid: ee78862cf437a7e4ca1369c7b0b5beae, type: 2}
-  waterMats:
-  - {fileID: 2100000, guid: 6d4eaef20b799a9469e3d8bae1e57049, type: 2}
-  - {fileID: 2100000, guid: c145928709a1a9e43a4f30bd7975df85, type: 2}
-  - {fileID: 2100000, guid: c4614291955ed21449dea0b421b68769, type: 2}
-  - {fileID: 2100000, guid: 3db461285d45f4742a836073b68d2559, type: 2}
-  - {fileID: 2100000, guid: 12f3167f5b0012c44a770e041d142310, type: 2}
-  - {fileID: 2100000, guid: 474a49f54a2c09340871ea8de761ee41, type: 2}
-  - {fileID: 2100000, guid: 18893de600d4ccc4791c1b864ee6be45, type: 2}
-  tree: {fileID: 222292335441431702, guid: 44a0a12a18f3d534da87600e9f20aae8, type: 3}
+  ressourceType1: 0
+  ressourceType2: 0
   treeParent: {fileID: 5417725066891541343}
   size: 3
   heightSize: 0.3
@@ -256,6 +241,18 @@ MonoBehaviour:
   hangar: {fileID: 2450179829027447185}
   explorer1: {fileID: 1974642023368158110}
   explorer2: {fileID: 3943040686702049936}
+  biomes:
+  - {fileID: 11400000, guid: 0c9bc6e19b470a340a26801e66affdaa, type: 2}
+  - {fileID: 11400000, guid: 536478456c8162a4e8ad02bc1dabf948, type: 2}
+  - {fileID: 11400000, guid: 374d49a1599eecd43895c3718273da1c, type: 2}
+  - {fileID: 11400000, guid: 9b21187180ea4214a8c8e58ca00df5d4, type: 2}
+  - {fileID: 11400000, guid: 52025b339e8d71b488118efe04fb93ca, type: 2}
+  - {fileID: 11400000, guid: 88bb8ac7ec0aba245919a9373a536e84, type: 2}
+  - {fileID: 11400000, guid: d967e96c34fefcb479473dc319da4db2, type: 2}
+  - {fileID: 11400000, guid: 1074c042f6bd0f4468a644f11e8e83ea, type: 2}
+  - {fileID: 11400000, guid: 6a3dc63e50ad7524fb2a2dd75a90c0f5, type: 2}
+  - {fileID: 11400000, guid: edfb5f4a68ef3bd4d9e3a0a9fd53a9a4, type: 2}
+  biome: {fileID: 0}
 --- !u!64 &7712598101018856616
 MeshCollider:
   m_ObjectHideFlags: 0

@@ -19,10 +19,8 @@ public class Planet : MonoBehaviour
     public MeshFilter filter;
     public MeshRenderer planetRenderer;
     public MeshRenderer waterRenderer;
-    public Material[] stratsMats;
-    public Material[] waterMats;
 
-    public GameObject tree;
+    public int ressourceType1,ressourceType2;
     public Transform treeParent;
 
     public float size;
@@ -39,7 +37,9 @@ public class Planet : MonoBehaviour
     [SerializeField] private Transform waterSphere;
 
     public Noise elevationNoise;
-    public Noise forestNoise;
+    public Noise densityNoise;
+    public Noise ressourceNoise;
+    public Noise colorNoise;
 
     public Dictionary<(int, int), int> midPointsDic = new Dictionary<(int, int), int>();
 
@@ -47,6 +47,10 @@ public class Planet : MonoBehaviour
 
     [SerializeField] private Transform hangar;
     [SerializeField] private ExplorerBehaviour explorer1, explorer2;
+
+    [Header("BIOME")] 
+    [SerializeField] private BiomeSO[] biomes;
+    [SerializeField] private BiomeSO biome;
 
     private void OnValidate()
     {
@@ -82,7 +86,9 @@ public class Planet : MonoBehaviour
         seed = RandomGenerator.GetRandomSeed();
 
         elevationNoise = new Noise((int)seed);
-        forestNoise = new Noise((int)seed + 1);
+        densityNoise = new Noise((int)seed + 1);
+        ressourceNoise = new Noise((int)seed + 2);
+        colorNoise = new Noise((int)seed + 3);
 
         RandomGenerator.SetSeed(seed);
 
@@ -97,11 +103,31 @@ public class Planet : MonoBehaviour
         waterLevel = RandomGenerator.GetRandomValueInt(0, maxHeight);
         waterSphere.localScale = Vector3.one * (size * 2 + heightSize * (waterLevel * 2 - 0.5f));
 
-        planetRenderer.material = new Material(stratsMats[RandomGenerator.GetRandomValueInt(0, stratsMats.Length)]);
+        // SET DU BIOME
+        biome = biomes[RandomGenerator.GetRandomValueInt(0, biomes.Length)];
+        
+        planetRenderer.material.SetColor("_BottomColor",biome.bottomColor);
+        planetRenderer.material.SetColor("_TopColor",biome.topColor);
+        planetRenderer.material.SetColor("_GroundColor",biome.groundColor);
         planetRenderer.material.SetFloat("_heightMax", maxHeight);
         planetRenderer.material.SetFloat("_GroundLevel", waterLevel);
 
-        waterRenderer.material = waterMats[RandomGenerator.GetRandomValueInt(0, waterMats.Length)];
+        waterRenderer.material = biome.waterMaterials[RandomGenerator.GetRandomValueInt(0, biome.waterMaterials.Length)];
+
+        if (biome.ressources.Length <= 2)
+        {
+            ressourceType1 = 0;
+            ressourceType2 = 1;
+        }
+        else
+        {
+            ressourceType1 = RandomGenerator.GetRandomValueInt(0, biome.ressources.Length);
+        
+            ressourceType2 = RandomGenerator.GetRandomValueInt(0, biome.ressources.Length);
+            if (ressourceType2 == ressourceType1) ressourceType2 = (ressourceType2 + 1) % biome.ressources.Length;   
+        }
+
+        // GENERATION DU MESH
 
         filter.mesh = null;
 
@@ -777,7 +803,7 @@ public class Planet : MonoBehaviour
             {
                 triPos = triangles[i].centralPoint;
                 triPos *= forestNoiseSize;
-                float v = (forestNoise.Evaluate(triPos) + 1) * 0.5f;
+                float v = (densityNoise.Evaluate(triPos) + 1) * 0.5f;
 
 
                 triangles[i].treeLevel = (int)(v * (6 + 1));
@@ -813,7 +839,10 @@ public class Planet : MonoBehaviour
                         ;
                     }
 
-                    GameObject newTree = Instantiate(tree, treePos + transform.position, Quaternion.LookRotation(
+                    int prefab = RandomGenerator.GetRandomValue() > (ressourceNoise.Evaluate(triPos) + 1.2f) * 0.3f ? 
+                        ressourceType1 : ressourceType2;
+                    
+                    GameObject newTree = Instantiate(biome.ressources[prefab].prefab, treePos + transform.position, Quaternion.LookRotation(
                         triangles[i].normal +
                         new Vector3(RandomGenerator.GetRandomValueInRange(-0.1f, 0.1f),
                             RandomGenerator.GetRandomValueInRange(-0.1f, 0.1f),
@@ -821,6 +850,14 @@ public class Planet : MonoBehaviour
 
                     newTree.transform.localScale = newTree.transform.localScale *
                                                    RandomGenerator.GetRandomValueInRange(0.9f, 1.1f);
+                    newTree.transform.Rotate(0,0,RandomGenerator.GetRandomValueInRange(0, 360));
+                    
+                    MeshRenderer treeRenderer = newTree.GetComponent<MeshRenderer>();
+                    Material[] treeMats = treeRenderer.materials;
+                    treeMats[biome.ressources[prefab].materialIndex] = new Material(treeMats[biome.ressources[prefab].materialIndex]);
+                    treeMats[biome.ressources[prefab].materialIndex].color = biome.ressources[prefab].colorGradient
+                        .Evaluate((colorNoise.Evaluate(triPos) + 1f) * 0.5f);
+                    treeRenderer.materials = treeMats;
                 }
             }
         }
@@ -834,7 +871,12 @@ public class Planet : MonoBehaviour
         {
             if (triangles[i].heightLevel >= waterLevel && triangles[triangles[i].neighbourA].heightLevel == triangles[i].heightLevel
                                                        && triangles[triangles[i].neighbourB].heightLevel == triangles[i].heightLevel
-                                                       && triangles[triangles[i].neighbourC].heightLevel == triangles[i].heightLevel)
+                                                       && triangles[triangles[i].neighbourC].heightLevel == triangles[i].heightLevel
+                                                       && triangles[i].treeLevel == 0
+                                                       && triangles[triangles[i].neighbourA].treeLevel == 0
+                                                       && triangles[triangles[i].neighbourB].treeLevel == 0
+                                                       && triangles[triangles[i].neighbourC].treeLevel == 0
+                                                       )
             {
                 triangle = triangles[i];
                 hangarIndex = i;
@@ -956,7 +998,6 @@ public class Triangle
     public List<Vector3Int> elevationTriangle = new List<Vector3Int>();
     public int heightLevel = 0;
     public int treeLevel = 0;
-    public int rockLevel = 0;
 }
 
 [Serializable]
