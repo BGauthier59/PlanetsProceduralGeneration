@@ -230,7 +230,9 @@ MonoBehaviour:
   camera: {fileID: 0}
   cam: {fileID: 0}
   baseDistance: 10
-  minMaxDistance: {x: -3, y: 13}
+  minMaxDistanceSub0: {x: -5, y: 10}
+  minMaxDistanceSub1: {x: -2, y: 13}
+  minMaxDistanceSub: {x: 0, y: 0}
   cameraSpeed: 5
   stepValue: 0.01
   actionSprites:
@@ -254,5 +256,10 @@ MonoBehaviour:
     treeLevel: 0
     explorersOnTriangle: 
     building: 0
+    constructing: 0
+    constructingBuilding: 4
+    constructionSign: {fileID: 0}
+    constructionAmount: 0
+    constructionText: {fileID: 0}
   cursorFilter: {fileID: 170858626881299089}
   selectedExplorer: {fileID: 0}

@@ -15,6 +15,7 @@ public class WorldManager : MonoSingleton<WorldManager>
     [SerializeField] private uint globalSeed;
     [SerializeField] private int explorationRadiusStep;
     private int explorationRadius;
+    [SerializeField] private float rocketSpeed;
 
     private async void Start()
     {
@@ -56,33 +57,54 @@ public class WorldManager : MonoSingleton<WorldManager>
         rocket.GetComponentInChildren<TrailRenderer>().enabled = true;
         rocket.SetParent(null);
 
-        #region Fly to planet
-
-        Triangle start = planet.triangles[index];
-        Vector3 p1, p2, p3, p4;
-        Vector3 old, dir;
-
-        float timer = 0;
+        #region CreatePlanet
 
         Planet newPlanet = await CreateNewPlanet(GetNewPlanetPositionAndAngle());
-        Triangle end = newPlanet.triangles[newPlanet.hangarIndex];
 
-        p1 = rocket.position;
-        p2 = rocket.position + start.elevationNormal * 30;
-        p3 = newPlanet.transform.TransformPoint(end.centralPoint)
-             + newPlanet.transform.TransformDirection(end.elevationNormal * 30);
-        p4 = newPlanet.transform.TransformPoint(end.centralPoint);
-        
-        while (timer < 5)
+        #endregion
+
+        #region Start flight
+
+        Triangle start = planet.triangles[index];
+        float timer = 0;
+        Vector3 old, dir;
+        Triangle end = newPlanet.triangles[newPlanet.hangarIndex];
+        dir = planet.transform.TransformDirection(start.elevationNormal);
+        while (timer < 2)
         {
             timer += Time.deltaTime;
             await Task.Yield();
+            rocket.position += dir * 5 * timer * Time.deltaTime;
+        }
+
+        timer = 0;
+
+        #endregion
+
+        #region Fly to planet
+
+        Vector3 p1, p2, p3, p4;
+
+
+        p1 = rocket.position;
+        p2 = rocket.position + planet.transform.TransformDirection(start.elevationNormal) * 30;
+        p3 = newPlanet.transform.TransformPoint(end.centralPoint)
+             + newPlanet.transform.TransformDirection(end.elevationNormal * 30);
+        p4 = newPlanet.transform.TransformPoint(end.centralPoint);
+
+        float duration = Vector3.Distance(planet.transform.position, newPlanet.transform.position) / rocketSpeed;
+
+        while (timer < duration)
+        {
             old = rocket.position;
-            rocket.position = ExBeziers.CubicBeziersCurve(p1, p2, p3, p4, timer / 5);
+            rocket.position = ExBeziers.CubicBeziersCurve(p1, p2, p3, p4, timer / duration);
             dir = (rocket.position - old).normalized;
             rocket.rotation = Quaternion.Slerp(rocket.rotation,
                 Quaternion.LookRotation(dir),
                 Time.deltaTime * 5);
+
+            timer += Time.deltaTime;
+            await Task.Yield();
         }
 
         #endregion
@@ -97,12 +119,12 @@ public class WorldManager : MonoSingleton<WorldManager>
     public async Task<Planet> CreateNewPlanet((Vector3, float) data)
     {
         var p = Instantiate(planetPrefab, data.Item1, Quaternion.identity, origin);
-        
+
         p.currentAngle = data.Item2;
         p.distanceFromOrigin = explorationRadius;
         p.orbitSpeed = RandomGenerator.GetRandomValueInRange(0, 0.1f);
         p.orbitSpeed = 0.2f;
-        
+
         await p.Initialize();
         allPlanets.Add(p);
         UIManager.instance.AddPlanetGui(allPlanets.Count - 1);
@@ -114,7 +136,7 @@ public class WorldManager : MonoSingleton<WorldManager>
     {
         explorationRadius += explorationRadiusStep;
         float randomAngle = math.radians(RandomGenerator.GetRandomValueInRange(0, 360));
-        
+
         Vector3 pos = new Vector3(explorationRadius * math.cos(randomAngle),
             0,
             explorationRadius * math.sin(randomAngle));
