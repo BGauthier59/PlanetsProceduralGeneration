@@ -8,6 +8,7 @@ using Random = UnityEngine.Random;
 public class WorldManager : MonoSingleton<WorldManager>
 {
     [SerializeField] private List<Planet> allPlanets;
+    [SerializeField] private List<ExplorerBehaviour> allExplorers;
     [SerializeField] private Planet planetPrefab;
     [SerializeField] private uint globalSeed;
 
@@ -22,6 +23,17 @@ public class WorldManager : MonoSingleton<WorldManager>
     public Planet GetPlanet(int index)
     {
         return allPlanets[index];
+    }
+    
+    public int AddExplorer(ExplorerBehaviour explorer)
+    {
+        allExplorers.Add(explorer);
+        return allExplorers.Count - 1;
+    }
+
+    public ExplorerBehaviour GetExplorer(int index)
+    {
+        return allExplorers[index];
     }
 
     public async Task CreateNewPlanet(Vector3 position)
