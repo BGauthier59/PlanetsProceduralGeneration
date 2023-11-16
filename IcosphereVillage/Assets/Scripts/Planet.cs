@@ -50,7 +50,7 @@ public class Planet : MonoBehaviour
 
     [Header("BIOME")] 
     [SerializeField] private BiomeSO[] biomes;
-    [SerializeField] private BiomeSO biome;
+    public BiomeSO biome;
 
     private void OnValidate()
     {
@@ -81,7 +81,7 @@ public class Planet : MonoBehaviour
         */
     }
 
-    public async void Initialize()
+    public async Task Initialize()
     {
         seed = RandomGenerator.GetRandomSeed();
 

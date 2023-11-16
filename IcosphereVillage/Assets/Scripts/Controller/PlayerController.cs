@@ -9,6 +9,8 @@ public class PlayerController : MonoSingleton<PlayerController>
 {
     [SerializeField] private Planet currentPlanet;
 
+    public bool isActive;
+    
     // Rotation
     private Vector2 mouseMove;
     private bool isDraggingPlanet;
@@ -29,22 +31,27 @@ public class PlayerController : MonoSingleton<PlayerController>
         currentPlanet = target;
         currentDistance = baseDistance;
         cam = camera.GetComponent<Camera>();
+        currentTriangle = null;
+        isActive = true;
     }
 
     public void OnRotate(InputAction.CallbackContext ctx)
     {
+        if (!isActive) return;
         if (!ctx.performed) return;
         mouseMove = ctx.ReadValue<Vector2>();
     }
 
     public void OnDragPlanet(InputAction.CallbackContext ctx)
     {
+        if (!isActive) return;
         if (ctx.started) isDraggingPlanet = true;
         else if (ctx.canceled) isDraggingPlanet = false;
     }
 
     public void OnScroll(InputAction.CallbackContext ctx)
     {
+        if (!isActive) return;
         if (!ctx.performed) return;
         scroll = ctx.ReadValue<Vector2>();
         SetDistance(-scroll.y);
@@ -52,6 +59,7 @@ public class PlayerController : MonoSingleton<PlayerController>
 
     private void Update()
     {
+        if (!isActive) return;
         if (isDraggingPlanet) RotateAroundDraggedPlanet();
         DetectCurrentTriangle();
         DrawCursor();
@@ -59,6 +67,7 @@ public class PlayerController : MonoSingleton<PlayerController>
 
     private void LateUpdate()
     {
+        if (!isActive) return;
         Zoom();
     }
 

@@ -368,7 +368,6 @@ MonoBehaviour:
     elevationTriangle: []
     heightLevel: 0
     treeLevel: 0
-    rockLevel: 0
   cursor: {fileID: 487081816}
   cursorFilter: {fileID: 487081818}
 --- !u!114 &371637860
@@ -920,7 +919,7 @@ MonoBehaviour:
   allPlanets: []
   planetPrefab: {fileID: 3254101452558638239, guid: c15a4d7057260e44199931fe0876fedb,
     type: 3}
-  globalSeed: 0
+  globalSeed: 922407865
 --- !u!4 &1093796947
 Transform:
   m_ObjectHideFlags: 0

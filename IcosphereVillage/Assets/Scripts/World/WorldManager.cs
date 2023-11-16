@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -10,11 +11,11 @@ public class WorldManager : MonoSingleton<WorldManager>
     [SerializeField] private Planet planetPrefab;
     [SerializeField] private uint globalSeed;
 
-    private void Start()
+    private async void Start()
     {
         RandomGenerator.seedGeneratorSeed = globalSeed;
         
-        CreateNewPlanet(Vector3.zero);
+        await CreateNewPlanet(Vector3.zero);
         PlayerController.instance.Initialize(allPlanets[0]);
     }
 
@@ -23,12 +24,12 @@ public class WorldManager : MonoSingleton<WorldManager>
         return allPlanets[index];
     }
 
-    public void CreateNewPlanet(Vector3 position)
+    public async Task CreateNewPlanet(Vector3 position)
     {
         var p = Instantiate(planetPrefab, position, Quaternion.identity);
-        p.Initialize();
-        UIManager.instance.AddPlanetGui(allPlanets.Count);
+        await p.Initialize();
         allPlanets.Add(p);
+        UIManager.instance.AddPlanetGui(allPlanets.Count - 1);
     }
 
     public void DEBUG_CreatePlanet()

@@ -171,8 +171,7 @@ public class ExplorerBehaviour : MonoBehaviour
         int[] neighbours = new[] { triangle.neighbourA, triangle.neighbourB, triangle.neighbourC };
         return neighbours;
     }
-
-
+    
     private void Update()
     {
         icon.transform.rotation = Quaternion.Euler(0,0,0);

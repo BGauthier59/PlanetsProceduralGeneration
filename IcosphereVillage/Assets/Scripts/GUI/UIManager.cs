@@ -7,10 +7,27 @@ public class UIManager : MonoSingleton<UIManager>
     [SerializeField] private PlanetGUI[] allPlanetGuis;
     [SerializeField] private Transform planetGuiLayout;
     [SerializeField] private PlanetGUI planetGuiPrefab;
+    private static readonly int WaterColor = Shader.PropertyToID("_WaterColor");
 
     public void AddPlanetGui(int newPlanetIndex)
     {
+        var p = WorldManager.instance.GetPlanet(newPlanetIndex);
         var n = Instantiate(planetGuiPrefab, Vector3.zero, Quaternion.identity, planetGuiLayout);
-        n.Initialize(newPlanetIndex);
+        Color w, e;
+        if (p.waterLevel == 0)
+        {
+            w = p.biome.groundColor;
+            e = p.biome.topColor;
+        }
+        else
+        {
+            w = p.waterRenderer.material.GetColor(WaterColor);
+            e = p.biome.groundColor;
+        }
+
+        w.a = 1;
+        e.a = 1;
+        n.Initialize(newPlanetIndex, w, e);
+
     }
 }
