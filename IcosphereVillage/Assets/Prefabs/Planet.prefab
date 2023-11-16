@@ -275,6 +275,7 @@ MonoBehaviour:
   rocket: {fileID: 8771618361602881056, guid: cf8eb7d3d4996654a9456ddf9d339eeb, type: 3}
   explorer1: {fileID: 1974642023368158110}
   explorer2: {fileID: 3943040686702049936}
+  hangarIndex: 0
   biomes:
   - {fileID: 11400000, guid: 0c9bc6e19b470a340a26801e66affdaa, type: 2}
   - {fileID: 11400000, guid: 536478456c8162a4e8ad02bc1dabf948, type: 2}
@@ -287,6 +288,9 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 6a3dc63e50ad7524fb2a2dd75a90c0f5, type: 2}
   - {fileID: 11400000, guid: edfb5f4a68ef3bd4d9e3a0a9fd53a9a4, type: 2}
   biome: {fileID: 0}
+  distanceFromOrigin: 0
+  orbitSpeed: 0
+  currentAngle: 0
 --- !u!64 &7712598101018856616
 MeshCollider:
   m_ObjectHideFlags: 0

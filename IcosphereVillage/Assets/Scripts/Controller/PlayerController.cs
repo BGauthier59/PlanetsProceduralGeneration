@@ -50,6 +50,8 @@ public class PlayerController : MonoSingleton<PlayerController>
         currentPlanet = p;
     }
 
+    public Planet GetCurrentPlanet => currentPlanet;
+
     private bool IsReadingInput()
     {
         if (!isActive || isZoomingRocket) return false;
@@ -87,7 +89,7 @@ public class PlayerController : MonoSingleton<PlayerController>
         ClickOnTile();
     }
 
-    private void Update()
+    public void UpdatePlayer()
     {
         if (!isActive) return;
         if (isDraggingPlanet) RotateAroundDraggedPlanet();
@@ -119,14 +121,17 @@ public class PlayerController : MonoSingleton<PlayerController>
         if (isZoomingRocket)
         {
             targetPos = rocket.position - Vector3.forward * baseDistance;
+            camera.position = Vector3.Lerp(camera.position, targetPos, cameraSpeed * Time.deltaTime);
+
         }
         else
         {
             targetPos = currentPlanet.transform.position - Vector3.forward * baseDistance -
                         camera.forward * currentDistance;
+            camera.position = targetPos;
+
         }
 
-        camera.position = Vector3.Lerp(camera.position, targetPos, cameraSpeed * Time.deltaTime);
     }
 
     public void SetZoomOnRocket(Transform target)
@@ -162,7 +167,7 @@ public class PlayerController : MonoSingleton<PlayerController>
         }
 
         //cursor.position = hit.point;
-
+        
         Triangle triangle;
         for (int i = 0; i < currentPlanet.triangles.Count; i++)
         {
@@ -191,8 +196,16 @@ public class PlayerController : MonoSingleton<PlayerController>
         Vector3 recalculatedCenter = currentPlanet.transform.TransformPoint(currentPlanet.GetTriangleCenterPoint(i));
 
         bool dotTest = math.dot(normal, recalculatedNormal) >= 0.999;
-        if (dotTest) return true;
+        bool distanceTest = Vector3.Distance(recalculatedCenter, point) < 1;
+        
+        if (dotTest  && distanceTest) return true;
         return false;
+    }
+    
+    public float CursorTriangleDot(Triangle triangle, Vector3 normal, Vector3 point, int i)
+    {
+        Vector3 recalculatedNormal = (currentPlanet.transform.TransformDirection(triangle.elevationNormal));
+        return math.dot(normal, recalculatedNormal);
     }
 
     public void DrawCursor()
