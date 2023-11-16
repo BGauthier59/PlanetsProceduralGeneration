@@ -100,7 +100,7 @@ public class WorldManager : MonoSingleton<WorldManager>
         
         p.currentAngle = data.Item2;
         p.distanceFromOrigin = explorationRadius;
-        p.orbitSpeed = RandomGenerator.GetRandomValueInRange(0, 0.5f);
+        p.orbitSpeed = RandomGenerator.GetRandomValueInRange(0, 0.1f);
         p.orbitSpeed = 0.2f;
         
         await p.Initialize();
@@ -124,6 +124,7 @@ public class WorldManager : MonoSingleton<WorldManager>
 
     private void RotatePlanetsAroundOrigin()
     {
+        return;
         foreach (var planet in allPlanets)
         {
             //if (planet == PlayerController.instance.GetCurrentPlanet) continue;

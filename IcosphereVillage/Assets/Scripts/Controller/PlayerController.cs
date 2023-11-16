@@ -165,8 +165,6 @@ public class PlayerController : MonoSingleton<PlayerController>
             SetNoTriangle();
             return;
         }
-
-        //cursor.position = hit.point;
         
         Triangle triangle;
         for (int i = 0; i < currentPlanet.triangles.Count; i++)
@@ -176,7 +174,6 @@ public class PlayerController : MonoSingleton<PlayerController>
             {
                 currentTriangle = triangle;
                 currentTriangleIndex = i;
-                //cursor.position = currentPlanet.transform.TransformPoint(Vector3.zero);
                 return;
             }
         }
@@ -201,20 +198,12 @@ public class PlayerController : MonoSingleton<PlayerController>
         if (dotTest  && distanceTest) return true;
         return false;
     }
-    
-    public float CursorTriangleDot(Triangle triangle, Vector3 normal, Vector3 point, int i)
-    {
-        Vector3 recalculatedNormal = (currentPlanet.transform.TransformDirection(triangle.elevationNormal));
-        return math.dot(normal, recalculatedNormal);
-    }
 
     public void DrawCursor()
     {
         if (currentTriangleIndex == -1)
         {
             cursorFilter.mesh = null;
-            //cursorFilter.mesh = cursorMesh;
-
             return;
         }
 
@@ -229,12 +218,6 @@ public class PlayerController : MonoSingleton<PlayerController>
         }
         else
         {
-            /*
-            v1 = currentPlanet.transform.TransformPoint(currentPlanet.vertices[currentTriangle.indices[0]]);
-            v2 = currentPlanet.transform.TransformPoint(currentPlanet.vertices[currentTriangle.indices[1]]);
-            v3 = currentPlanet.transform.TransformPoint(currentPlanet.vertices[currentTriangle.indices[2]]);
-            */
-
             v1 = currentPlanet.transform.TransformPoint(
                 currentPlanet.vertices[currentTriangle.elevationTriangle[^1].x]);
             v2 = currentPlanet.transform.TransformPoint(
