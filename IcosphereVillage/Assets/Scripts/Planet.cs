@@ -50,6 +50,8 @@ public class Planet : MonoBehaviour
 
     [SerializeField] private GameObject hangar, house, rocket, constructionSign;
     [SerializeField] private ExplorerBehaviour explorer1, explorer2;
+    [SerializeField] private GameObject explorerPrefab;
+    
     public Dictionary<int, Transform> rocketByIndex = new Dictionary<int, Transform>();
     public List<TMP_Text> hangarTexts;
     public int hangarIndex;
@@ -103,8 +105,16 @@ public class Planet : MonoBehaviour
         RandomGenerator.SetSeed(seed);
 
         subdivisions = RandomGenerator.GetRandomValueInt(2, 4);
-        if (subdivisions == 3) size = 4f;
-        else size = 1f;
+        if (subdivisions == 3)
+        {
+            size = 4f;
+            noiseSize = RandomGenerator.GetRandomValueInRange(0.2f,0.5f);
+        }
+        else
+        {
+            size = 1f;
+            noiseSize = RandomGenerator.GetRandomValueInRange(0.3f,0.7f);
+        }
 
         // MAX HEIGHT DE 2 A 5
         maxHeight = RandomGenerator.GetRandomValueInt(2, 6);
@@ -1110,6 +1120,12 @@ public class Planet : MonoBehaviour
         {
             hangarTexts.Add(tr.GetChild(0).GetChild(0).GetComponent<TMP_Text>());
         }
+
+        if (building == Building.House)
+        {
+            ExplorerBehaviour explorer = Instantiate(explorerPrefab, Vector3.zero, quaternion.identity).GetComponent<ExplorerBehaviour>();
+            explorer.Initialize(this, index);
+        }
     }
     
     public void CreateConstructionSign(int index)
@@ -1132,15 +1148,18 @@ public class Planet : MonoBehaviour
         switch (triangles[index].constructingBuilding)
         {
             case Building.House:
-                triangles[index].constructionGoal = 6;
+                triangles[index].constructionGoal = 4;
+                tr.GetChild(0).GetComponent<SpriteRenderer>().sprite = PlayerController.instance.buildingSprites[0];
                 break;
             
             case Building.Hangar:
-                triangles[index].constructionGoal = 9;
+                triangles[index].constructionGoal = 8;
+                tr.GetChild(0).GetComponent<SpriteRenderer>().sprite = PlayerController.instance.buildingSprites[1];
                 break;
             
             case Building.Rocket:
-                triangles[index].constructionGoal = 15;
+                triangles[index].constructionGoal = 12;
+                tr.GetChild(0).GetComponent<SpriteRenderer>().sprite = PlayerController.instance.buildingSprites[2];
                 break;
         }
     }

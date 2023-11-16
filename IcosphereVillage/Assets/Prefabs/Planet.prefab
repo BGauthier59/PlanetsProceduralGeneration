@@ -265,7 +265,7 @@ MonoBehaviour:
   subdivisions: 3
   maxHeight: 4
   seed: 92600
-  noiseSize: 0.3
+  noiseSize: 0.7
   forestNoiseSize: 0.5
   waterLevel: 0
   hangarRessourceAmount: 0
@@ -278,6 +278,9 @@ MonoBehaviour:
     type: 3}
   explorer1: {fileID: 1974642023368158110}
   explorer2: {fileID: 3943040686702049936}
+  explorerPrefab: {fileID: 2911491784050308402, guid: af357725492a8c8419b6d4fbd9ed2b64,
+    type: 3}
+  hangarTexts: []
   hangarIndex: 0
   biomes:
   - {fileID: 11400000, guid: 0c9bc6e19b470a340a26801e66affdaa, type: 2}

@@ -331,7 +331,25 @@ public class ExplorerBehaviour : MonoBehaviour
             {
                 // PLUS D'ARBRE A COUPER
                 // TASK = NONE
-                ChangeTask(ExplorerTask.None);
+                if (home.triangles[home.triangles[taskTriangle].neighbourA].treeLevel > 0)
+                {
+                    taskTriangle = home.triangles[taskTriangle].neighbourA;
+                    TravelForRecolting();
+                }
+                else if (home.triangles[home.triangles[taskTriangle].neighbourB].treeLevel > 0)
+                {
+                    taskTriangle = home.triangles[taskTriangle].neighbourB;
+                    TravelForRecolting();
+                }
+                else if (home.triangles[home.triangles[taskTriangle].neighbourC].treeLevel > 0)
+                {
+                    taskTriangle = home.triangles[taskTriangle].neighbourC;
+                    TravelForRecolting();
+                }
+                else
+                {
+                    ChangeTask(ExplorerTask.None);   
+                }
             }
             else
             {

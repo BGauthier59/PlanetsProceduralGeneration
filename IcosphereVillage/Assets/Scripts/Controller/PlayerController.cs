@@ -9,8 +9,14 @@ using UnityEngine.InputSystem;
 public class PlayerController : MonoSingleton<PlayerController>
 {
     [SerializeField] private Planet currentPlanet;
-
+    
     public bool isActive;
+    
+    // Selection Wheel
+    public bool isSelecting;
+    public int selection;
+    public int selectionTriangle;
+    public ExplorerBehaviour selectionExplorer;
 
     // Rotation
     private Vector2 mouseMove;
@@ -29,6 +35,7 @@ public class PlayerController : MonoSingleton<PlayerController>
 
     // Explorer Selection
     public Sprite[] actionSprites;
+    public Sprite[] buildingSprites;
 
     // Rocket
     [SerializeField] private float holdDuration;
@@ -86,9 +93,44 @@ public class PlayerController : MonoSingleton<PlayerController>
         if (ctx.canceled) isHolding = false;
         if (!ctx.performed) return;
         isHolding = true;
-        ClickOnTile();
+        if (!isSelecting) ClickOnTile();
+        else SelectOption();
     }
 
+    public void SelectOption()
+    {
+        isSelecting = false;
+        switch (selection)
+        {
+            case 0:
+                Debug.Log("GO TO TILE");
+                selectionExplorer.TargetTile(selectionTriangle);
+                selectionExplorer.ChangeTask(ExplorerTask.None);
+                break;
+            case 1:
+                Debug.Log("TASK SET TO BUILDING");
+                selectionExplorer.taskTriangle = selectionTriangle;
+                selectionExplorer.taskBuilding = Building.Rocket;
+                selectionExplorer.ChangeTask(ExplorerTask.Building);
+                selectionExplorer.TravelForBuilding();
+                break;
+            case 2:
+                Debug.Log("TASK SET TO BUILDING");
+                selectionExplorer.taskTriangle = selectionTriangle;
+                selectionExplorer.taskBuilding = Building.Hangar;
+                selectionExplorer.ChangeTask(ExplorerTask.Building);
+                selectionExplorer.TravelForBuilding();
+                break;
+            case 3:
+                Debug.Log("TASK SET TO BUILDING");
+                selectionExplorer.taskTriangle = selectionTriangle;
+                selectionExplorer.taskBuilding = Building.House;
+                selectionExplorer.ChangeTask(ExplorerTask.Building);
+                selectionExplorer.TravelForBuilding();
+                break;
+        }
+        UIManager.instance.HideChoiceWheel();
+    }
     public void UpdatePlayer()
     {
         if (!isActive) return;
@@ -249,12 +291,47 @@ public class PlayerController : MonoSingleton<PlayerController>
 
         if (currentTriangle == null || currentPlanet == null) return;
 
+        if (selectedExplorer == null)
+        {
+            if (currentTriangle.explorersOnTriangle.Count > 0)
+            {
+                SetSelectedExplorer();
+            }
+        }
+        else
+        {
+            if (currentPlanet.triangles[currentTriangleIndex].treeLevel > 0)
+            {
+                selectedExplorer.taskTriangle = currentTriangleIndex;
+                selectedExplorer.ChangeTask(ExplorerTask.Recolting);
+                selectedExplorer.TravelForRecolting();
+                
+            }
+            else if (currentPlanet.triangles[currentTriangleIndex].constructing)
+            {
+                selectedExplorer.taskTriangle = currentTriangleIndex;
+                selectedExplorer.ChangeTask(ExplorerTask.Building);
+                selectedExplorer.TravelForBuilding();
+                
+            }
+            else if (currentPlanet.triangles[currentTriangleIndex].heightLevel >= currentPlanet.waterLevel)
+            {
+                isSelecting = true;
+                selectionTriangle = currentTriangleIndex;
+                selectionExplorer = selectedExplorer;
+                UIManager.instance.SetChoiceWheel();
+            }
+            else
+            {
+                selectedExplorer.ChangeTask(ExplorerTask.None);
+            }
+            
+            UnSelectExplorer();
+            
+        }
+        
         switch (currentTriangle.building)
         {
-            case Building.House:
-                break;
-            case Building.Hangar:
-                break;
             case Building.Rocket:
 
                 int saveIndex = currentTriangleIndex;
@@ -272,46 +349,6 @@ public class PlayerController : MonoSingleton<PlayerController>
 
                 WorldManager.instance.LaunchAircraft(currentPlanet, saveIndex);
                 return;
-
-            case Building.Bridge:
-                break;
-            case Building.None:
-                break;
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
-
-        if (selectedExplorer == null)
-        {
-            if (currentTriangle.explorersOnTriangle.Count > 0)
-            {
-                SetSelectedExplorer();
-            }
-        }
-        else
-        {
-            if (currentPlanet.triangles[currentTriangleIndex].treeLevel > 0)
-            {
-                selectedExplorer.taskTriangle = currentTriangleIndex;
-                selectedExplorer.ChangeTask(ExplorerTask.Recolting);
-                selectedExplorer.TravelForRecolting();
-                
-            }
-            else if (currentPlanet.triangles[currentTriangleIndex].heightLevel >= currentPlanet.waterLevel)
-            {
-                Debug.Log("TASK SET TO BUILDING");
-                selectedExplorer.taskTriangle = currentTriangleIndex;
-                selectedExplorer.taskBuilding = Building.House;
-                selectedExplorer.ChangeTask(ExplorerTask.Building);
-                selectedExplorer.TravelForBuilding();
-            }
-            else
-            {
-                selectedExplorer.ChangeTask(ExplorerTask.None);
-            }
-            
-            UnSelectExplorer();
-            
         }
     }
 
