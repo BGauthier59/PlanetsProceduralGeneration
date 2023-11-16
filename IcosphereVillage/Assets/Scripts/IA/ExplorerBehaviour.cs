@@ -18,9 +18,10 @@ public class ExplorerBehaviour : MonoBehaviour
     [SerializeField] private int locationIndex;
     [SerializeField] private SpriteRenderer icon;
     [SerializeField] private float iconSize = 0.1f;
+    [SerializeField] private bool hasRessource;
 
     [SerializeField] private ExplorerTask task;
-    [SerializeField] private int taskTriangle;
+    [SerializeField] public int taskTriangle;
     
     public void Initialize(Planet home, int startLocationIndex)
     {
@@ -52,20 +53,22 @@ public class ExplorerBehaviour : MonoBehaviour
         if (data == null)
         {
             Debug.LogWarning("You can't go there");
-            return;
-        }
-
-        if (home.triangles[newLocation].treeLevel > 0)
-        {
-            ChangeTask(ExplorerTask.Recolting);
-        }
-        else
-        {
             ChangeTask(ExplorerTask.None);
+            return;
         }
 
         int[] reversePath = RecalculatePathFinding(newLocation, data);
         await MoveToTargetPoint(reversePath);
+
+        switch (task)
+        {
+            case ExplorerTask.Recolting:
+                TravelForRecolting();
+                break;
+            case ExplorerTask.Building:
+                TravelForRecolting();
+                break;
+        }
     }
 
     #region Path Finding
@@ -116,6 +119,53 @@ public class ExplorerBehaviour : MonoBehaviour
             if (currentNeighbours.Count == 0) return null;
         }
     }
+    
+    private int FindClosestHangar()
+    {
+        int iterator = 0;
+
+        Dictionary<int, int>
+            pathFindingData = new Dictionary<int, int>
+                { { locationIndex, iterator } }; // Key is triangle index, Value is weight
+
+        int calculatingIndex = locationIndex;
+        List<int> currentNeighbours = GetNeighbours(calculatingIndex).ToList();
+        List<int> nextNeighbours = new List<int>();
+
+        // We find target
+        while (true)
+        {
+            iterator++;
+
+            foreach (var neighbour in currentNeighbours)
+            {
+                if (pathFindingData.ContainsKey(neighbour)) continue; // Already shorter path found, index ignored
+
+                // We'll check this index neighbours later
+                int[] next = GetNeighbours(neighbour);
+                foreach (var n in next)
+                {
+                    if (!IsNeighbourReachable(neighbour, n)) continue;
+                    
+                    nextNeighbours.Add(n);
+                }
+
+                pathFindingData.Add(neighbour, iterator);
+
+                if (home.triangles[neighbour].building == Building.Hangar) return neighbour;
+            }
+
+            currentNeighbours.Clear();
+            foreach (var next in nextNeighbours)
+            {
+                currentNeighbours.Add(next);
+            }
+
+            nextNeighbours.Clear();
+            if (currentNeighbours.Count == 0) return -1;
+        }
+    }
+    
 
     private bool IsNeighbourReachable(int from, int to)
     {
@@ -146,7 +196,7 @@ public class ExplorerBehaviour : MonoBehaviour
                 {
                     stepBack = neighbour;
                     path.Add(stepBack);
-                    if (distance == 0) return path.ToArray();
+                    if (distance == 1) return path.ToArray();
                     maxDistance--;
                     break;
                 }
@@ -220,7 +270,7 @@ public class ExplorerBehaviour : MonoBehaviour
                                         PlayerController.instance.cam.transform.position)) * iconSize);
     }
 
-    private void ChangeTask(ExplorerTask newTask)
+    public void ChangeTask(ExplorerTask newTask)
     {
         task = newTask;
         switch (newTask)
@@ -240,6 +290,118 @@ public class ExplorerBehaviour : MonoBehaviour
             case ExplorerTask.Cargoing:
                 icon.sprite = PlayerController.instance.actionSprites[4];
                 break;
+        }
+    }
+
+    private void TravelForRecolting()
+    {
+        if (!hasRessource)
+        {
+            if (locationIndex == taskTriangle && home.triangles[taskTriangle].treeLevel > 0)
+            {
+                hasRessource = true;
+                        
+                // COUPER UN ARBRE
+                home.triangles[locationIndex].treeLevel--;
+
+                // TROUVER LE HANGAR LE PLUS PROCHE
+                int hangar = FindClosestHangar();
+                        
+                // Y ALLER
+                if (hangar == -1)
+                {
+                    ChangeTask(ExplorerTask.None);
+                    return;
+                }
+
+                TargetTile(hangar);
+            }
+            else if (locationIndex == taskTriangle)
+            {
+                // PLUS D'ARBRE A COUPER
+                // TASK = NONE
+                ChangeTask(ExplorerTask.None);
+            }
+            else
+            {
+                TargetTile(taskTriangle);
+            }
+        }
+        else if (hasRessource)
+        {
+            if (home.triangles[locationIndex].building == Building.Hangar)
+            {
+                hasRessource = false;
+                        
+                // RETOURNE A SA CASE DE TASK
+                TargetTile(taskTriangle);
+            }
+            else
+            {
+                int hangar = FindClosestHangar();
+                        
+                if (hangar == -1)
+                {
+                    ChangeTask(ExplorerTask.None);
+                    return;
+                }
+
+                TargetTile(hangar);
+            }
+        }
+    }
+    
+    private void EndOfTravelBuilding()
+    {
+        if (!hasRessource)
+        {
+            if (home.triangles[locationIndex].treeLevel > 0)
+            {
+                hasRessource = true;
+                        
+                // COUPER UN ARBRE
+                home.triangles[locationIndex].treeLevel--;
+
+                // TROUVER LE HANGAR LE PLUS PROCHE
+                int hangar = FindClosestHangar();
+                        
+                // Y ALLER
+                if (hangar == -1)
+                {
+                    ChangeTask(ExplorerTask.None);
+                    return;
+                }
+
+                TargetTile(hangar);
+            }
+            else
+            {
+                // PLUS D'ARBRE A COUPER
+                // TASK = NONE
+                ChangeTask(ExplorerTask.None);
+            }
+        }
+        else if (hasRessource)
+        {
+            if (home.triangles[locationIndex].building == Building.Hangar)
+            {
+                hasRessource = false;
+                        
+                // RETOURNE A SA CASE DE TASK
+                TargetTile(taskTriangle);
+            }
+            else
+            {
+                int hangar = FindClosestHangar();
+                        
+                if (hangar == -1)
+                {
+                    ChangeTask(ExplorerTask.None);
+                    return;
+                }
+
+                TargetTile(hangar);
+            }
         }
     }
 }
