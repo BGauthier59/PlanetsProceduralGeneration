@@ -312,6 +312,8 @@ public class ExplorerBehaviour : MonoBehaviour
                         
                 // COUPER UN ARBRE
                 home.triangles[locationIndex].treeLevel--;
+                Destroy(home.triangles[locationIndex].trees[home.triangles[locationIndex].treeLevel]);
+                home.triangles[locationIndex].trees.RemoveAt(home.triangles[locationIndex].treeLevel);
 
                 // TROUVER LE HANGAR LE PLUS PROCHE
                 int hangar = FindClosestHangar();
@@ -342,6 +344,7 @@ public class ExplorerBehaviour : MonoBehaviour
             {
                 hasRessource = false;
                 home.hangarRessourceAmount++;
+                home.UpdateHangarsTexts();
                         
                 // RETOURNE A SA CASE DE TASK
                 TargetTile(taskTriangle);
@@ -370,8 +373,10 @@ public class ExplorerBehaviour : MonoBehaviour
                 // SUR HANGAR ET RESSOURCE
                 
                 hasRessource = true;
-                        
+
                 // ENLEVER DE LA RESSOURCE AU HANGAR
+                home.hangarRessourceAmount--;
+                home.UpdateHangarsTexts();
                 
                 TargetTile(taskTriangle);
             }
@@ -418,8 +423,12 @@ public class ExplorerBehaviour : MonoBehaviour
                 }
 
                 home.triangles[locationIndex].constructionAmount++;
+                home.UpdateConstructionSign(locationIndex);
 
-                if (home.triangles[locationIndex].constructionAmount > 3)
+                
+                
+                
+                if (home.triangles[locationIndex].constructionAmount >= home.triangles[locationIndex].constructionGoal)
                 {
                     Destroy(home.triangles[locationIndex].constructionSign);
                     home.CreateBuilding(locationIndex,home.triangles[locationIndex].constructingBuilding);
