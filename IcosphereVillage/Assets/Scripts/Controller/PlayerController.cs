@@ -50,6 +50,8 @@ public class PlayerController : MonoSingleton<PlayerController>
         currentPlanet = p;
     }
 
+    public Planet GetCurrentPlanet => currentPlanet;
+
     private bool IsReadingInput()
     {
         if (!isActive || isZoomingRocket) return false;
@@ -87,7 +89,7 @@ public class PlayerController : MonoSingleton<PlayerController>
         ClickOnTile();
     }
 
-    private void Update()
+    public void UpdatePlayer()
     {
         if (!isActive) return;
         if (isDraggingPlanet) RotateAroundDraggedPlanet();
@@ -119,14 +121,17 @@ public class PlayerController : MonoSingleton<PlayerController>
         if (isZoomingRocket)
         {
             targetPos = rocket.position - Vector3.forward * baseDistance;
+            camera.position = Vector3.Lerp(camera.position, targetPos, cameraSpeed * Time.deltaTime);
+
         }
         else
         {
             targetPos = currentPlanet.transform.position - Vector3.forward * baseDistance -
                         camera.forward * currentDistance;
+            camera.position = targetPos;
+
         }
 
-        camera.position = Vector3.Lerp(camera.position, targetPos, cameraSpeed * Time.deltaTime);
     }
 
     public void SetZoomOnRocket(Transform target)
@@ -160,9 +165,7 @@ public class PlayerController : MonoSingleton<PlayerController>
             SetNoTriangle();
             return;
         }
-
-        //cursor.position = hit.point;
-
+        
         Triangle triangle;
         for (int i = 0; i < currentPlanet.triangles.Count; i++)
         {
@@ -171,7 +174,6 @@ public class PlayerController : MonoSingleton<PlayerController>
             {
                 currentTriangle = triangle;
                 currentTriangleIndex = i;
-                //cursor.position = currentPlanet.transform.TransformPoint(Vector3.zero);
                 return;
             }
         }
@@ -191,7 +193,9 @@ public class PlayerController : MonoSingleton<PlayerController>
         Vector3 recalculatedCenter = currentPlanet.transform.TransformPoint(currentPlanet.GetTriangleCenterPoint(i));
 
         bool dotTest = math.dot(normal, recalculatedNormal) >= 0.999;
-        if (dotTest) return true;
+        bool distanceTest = Vector3.Distance(recalculatedCenter, point) < 1;
+        
+        if (dotTest  && distanceTest) return true;
         return false;
     }
 
@@ -200,8 +204,6 @@ public class PlayerController : MonoSingleton<PlayerController>
         if (currentTriangleIndex == -1)
         {
             cursorFilter.mesh = null;
-            //cursorFilter.mesh = cursorMesh;
-
             return;
         }
 
@@ -216,12 +218,6 @@ public class PlayerController : MonoSingleton<PlayerController>
         }
         else
         {
-            /*
-            v1 = currentPlanet.transform.TransformPoint(currentPlanet.vertices[currentTriangle.indices[0]]);
-            v2 = currentPlanet.transform.TransformPoint(currentPlanet.vertices[currentTriangle.indices[1]]);
-            v3 = currentPlanet.transform.TransformPoint(currentPlanet.vertices[currentTriangle.indices[2]]);
-            */
-
             v1 = currentPlanet.transform.TransformPoint(
                 currentPlanet.vertices[currentTriangle.elevationTriangle[^1].x]);
             v2 = currentPlanet.transform.TransformPoint(

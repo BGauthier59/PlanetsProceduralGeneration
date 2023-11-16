@@ -56,6 +56,11 @@ public class Planet : MonoBehaviour
     [Header("BIOME")] [SerializeField] private BiomeSO[] biomes;
     public BiomeSO biome;
 
+
+    public float distanceFromOrigin;
+    public float orbitSpeed;
+    public float currentAngle;
+
     private void OnValidate()
     {
     }
@@ -1057,7 +1062,11 @@ public class Planet : MonoBehaviour
 
         triangles[index].building = Building.Bridge;
         triangles[index].heightLevel = waterLevel;
-        Transform tr = Instantiate(biome.waterPlatform, Vector3.zero, Quaternion.LookRotation(triangles[index].normal),
+        
+        Quaternion rotation = Quaternion.
+            LookRotation(transform.TransformDirection(triangles[index].normal));
+        
+        Transform tr = Instantiate(biome.waterPlatform, Vector3.zero, rotation,
             buildingsParent).transform;
         tr.localPosition = GetTriangleCenterPoint(index) - triangles[index].normal * 0.2f * heightSize;
         tr.transform.Rotate(0, 0, RandomGenerator.GetRandomValueInRange(0, 360));
@@ -1077,13 +1086,17 @@ public class Planet : MonoBehaviour
             Building.Rocket => rocket,
         };
 
-        Transform tr = Instantiate(prefab, Vector3.zero, Quaternion.LookRotation(triangles[index].normal),
+        Quaternion rotation = Quaternion.
+            LookRotation(transform.TransformDirection(triangles[index].normal));
+        
+        Transform tr = Instantiate(prefab, Vector3.zero, rotation,
             buildingsParent).transform;
         tr.localPosition = GetTriangleCenterPoint(index);
         tr.transform.Rotate(0, 0, RandomGenerator.GetRandomValueInRange(0, 360));
 
         if (building == Building.Rocket)
         {
+            tr.GetComponentInChildren<TrailRenderer>().enabled = false;
             rocketByIndex.Add(index, tr);
         }
     }

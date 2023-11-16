@@ -291,6 +291,9 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 6a3dc63e50ad7524fb2a2dd75a90c0f5, type: 2}
   - {fileID: 11400000, guid: edfb5f4a68ef3bd4d9e3a0a9fd53a9a4, type: 2}
   biome: {fileID: 0}
+  distanceFromOrigin: 0
+  orbitSpeed: 0
+  currentAngle: 0
 --- !u!64 &7712598101018856616
 MeshCollider:
   m_ObjectHideFlags: 0
