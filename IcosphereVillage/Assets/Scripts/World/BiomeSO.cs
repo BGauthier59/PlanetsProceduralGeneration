@@ -13,6 +13,8 @@ public class BiomeSO : ScriptableObject
     public Material[] waterMaterials;
 
     [SerializeField] public RessourceType[] ressources;
+
+    public GameObject waterPlatform;
 }
 
 [Serializable]
