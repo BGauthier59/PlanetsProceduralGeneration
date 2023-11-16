@@ -27,7 +27,9 @@ public class PlayerController : MonoSingleton<PlayerController>
     [SerializeField] private Transform camera;
     public Camera cam;
     [SerializeField] private float baseDistance;
-    [SerializeField] private Vector2 minMaxDistance;
+    [SerializeField] private Vector2 minMaxDistanceSub0;
+    [SerializeField] private Vector2 minMaxDistanceSub1;
+    private Vector2 minMaxDistanceSub;
     [SerializeField] private float cameraSpeed;
     [SerializeField] private float stepValue;
     private float currentDistance;
@@ -55,6 +57,8 @@ public class PlayerController : MonoSingleton<PlayerController>
     public void SetCurrentPlanet(Planet p)
     {
         currentPlanet = p;
+        minMaxDistanceSub = p.subdivisions == 2 ? minMaxDistanceSub0 : minMaxDistanceSub1;
+        SetDistance(0);
     }
 
     public Planet GetCurrentPlanet => currentPlanet;
@@ -154,7 +158,7 @@ public class PlayerController : MonoSingleton<PlayerController>
     private void SetDistance(float delta)
     {
         currentDistance += delta * stepValue;
-        currentDistance = math.clamp(currentDistance, minMaxDistance.x, minMaxDistance.y);
+        currentDistance = math.clamp(currentDistance, minMaxDistanceSub.x, minMaxDistanceSub.y);
     }
 
     private void Zoom()
@@ -163,17 +167,13 @@ public class PlayerController : MonoSingleton<PlayerController>
         if (isZoomingRocket)
         {
             targetPos = rocket.position - Vector3.forward * baseDistance;
-            camera.position = Vector3.Lerp(camera.position, targetPos, cameraSpeed * Time.deltaTime);
-
         }
         else
         {
             targetPos = currentPlanet.transform.position - Vector3.forward * baseDistance -
                         camera.forward * currentDistance;
-            camera.position = targetPos;
-
         }
-
+        camera.position = Vector3.Lerp(camera.position, targetPos, cameraSpeed * Time.deltaTime);
     }
 
     public void SetZoomOnRocket(Transform target)
@@ -190,7 +190,7 @@ public class PlayerController : MonoSingleton<PlayerController>
 
     public void SetNewTarget(int i)
     {
-        currentPlanet = WorldManager.instance.GetPlanet(i);
+        SetCurrentPlanet(WorldManager.instance.GetPlanet(i));
     }
 
     public int currentTriangleIndex = -1;
@@ -288,7 +288,6 @@ public class PlayerController : MonoSingleton<PlayerController>
 
     private async void ClickOnTile()
     {
-
         if (currentTriangle == null || currentPlanet == null) return;
 
         if (selectedExplorer == null)
@@ -329,26 +328,23 @@ public class PlayerController : MonoSingleton<PlayerController>
             UnSelectExplorer();
             
         }
-        
-        switch (currentTriangle.building)
+
+        if (currentTriangle.building == Building.Rocket)
         {
-            case Building.Rocket:
-
-                int saveIndex = currentTriangleIndex;
-                float holdTimer = 0;
-                while (holdTimer < holdDuration)
+            int saveIndex = currentTriangleIndex;
+            float holdTimer = 0;
+            while (holdTimer < holdDuration)
+            {
+                holdTimer += Time.deltaTime;
+                await Task.Yield();
+                if (!isHolding)
                 {
-                    holdTimer += Time.deltaTime;
-                    await Task.Yield();
-                    if (!isHolding)
-                    {
-                        Debug.Log("stop holding");
-                        return;
-                    }
+                    Debug.Log("stop holding");
+                    return;
                 }
+            }
 
-                WorldManager.instance.LaunchAircraft(currentPlanet, saveIndex);
-                return;
+            WorldManager.instance.LaunchAircraft(currentPlanet, saveIndex);
         }
     }
 

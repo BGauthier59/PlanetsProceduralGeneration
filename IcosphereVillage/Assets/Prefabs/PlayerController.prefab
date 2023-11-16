@@ -226,15 +226,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   currentPlanet: {fileID: 0}
   isActive: 0
-  isSelecting: 0
-  selection: 0
-  selectionTriangle: 0
-  selectionExplorer: {fileID: 0}
   rotateSensibility: 0.3
   camera: {fileID: 0}
   cam: {fileID: 0}
   baseDistance: 10
-  minMaxDistance: {x: -3, y: 13}
+  minMaxDistanceSub0: {x: -5, y: 10}
+  minMaxDistanceSub1: {x: -2, y: 13}
+  minMaxDistanceSub: {x: 0, y: 0}
   cameraSpeed: 5
   stepValue: 0.01
   actionSprites:
@@ -242,10 +240,6 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 92cee353c2794ad41a2cf91dc044cfb8, type: 3}
   - {fileID: 21300000, guid: f01143e258d639e4394ad25281c49d9c, type: 3}
   - {fileID: 21300000, guid: a6f14ca703647b04aa825a5c84fe1f40, type: 3}
-  - {fileID: 21300000, guid: f1a127f2dca48644784ea02427e9136a, type: 3}
-  buildingSprites:
-  - {fileID: 21300000, guid: 004baf8843409324ea7fb1cfffb84547, type: 3}
-  - {fileID: 21300000, guid: 03d7b683e80b69546b89e24b4a6fb14a, type: 3}
   - {fileID: 21300000, guid: f1a127f2dca48644784ea02427e9136a, type: 3}
   holdDuration: 1
   currentTriangleIndex: 0
@@ -260,14 +254,12 @@ MonoBehaviour:
     elevationTriangle: []
     heightLevel: 0
     treeLevel: 0
-    trees: []
     explorersOnTriangle: 
     building: 0
     constructing: 0
     constructingBuilding: 4
     constructionSign: {fileID: 0}
     constructionAmount: 0
-    constructionGoal: 0
     constructionText: {fileID: 0}
   cursorFilter: {fileID: 170858626881299089}
   selectedExplorer: {fileID: 0}
