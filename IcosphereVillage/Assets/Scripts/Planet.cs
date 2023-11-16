@@ -51,6 +51,7 @@ public class Planet : MonoBehaviour
     [SerializeField] private GameObject hangar, house, rocket, constructionSign;
     [SerializeField] private ExplorerBehaviour explorer1, explorer2;
     public Dictionary<int, Transform> rocketByIndex = new Dictionary<int, Transform>();
+    public List<TMP_Text> hangarTexts;
     public int hangarIndex;
 
     [Header("BIOME")] [SerializeField] private BiomeSO[] biomes;
@@ -890,6 +891,9 @@ public class Planet : MonoBehaviour
                                                    RandomGenerator.GetRandomValueInRange(0.9f, 1.1f);
                     newTree.transform.Rotate(0, 0, RandomGenerator.GetRandomValueInRange(0, 360));
 
+                    
+                    triangles[i].trees.Add(newTree);
+                    
                     MeshRenderer treeRenderer = newTree.GetComponent<MeshRenderer>();
                     Material[] treeMats = treeRenderer.materials;
                     treeMats[biome.ressources[prefab].materialIndex] =
@@ -938,6 +942,8 @@ public class Planet : MonoBehaviour
             .transform;
 
         tr.localPosition = pos;
+        
+        hangarTexts.Add(tr.GetChild(0).GetChild(0).GetComponent<TMP_Text>());
     }
 
     void CreateFirstExplorers(int tri)
@@ -1099,6 +1105,11 @@ public class Planet : MonoBehaviour
             tr.GetComponentInChildren<TrailRenderer>().enabled = false;
             rocketByIndex.Add(index, tr);
         }
+
+        if (building == Building.Hangar)
+        {
+            hangarTexts.Add(tr.GetChild(0).GetChild(0).GetComponent<TMP_Text>());
+        }
     }
     
     public void CreateConstructionSign(int index)
@@ -1107,18 +1118,44 @@ public class Planet : MonoBehaviour
             triangles[index].treeLevel > 0) return;
         
 
-        Transform tr = Instantiate(constructionSign, Vector3.zero, Quaternion.LookRotation(triangles[index].normal),
+        Quaternion rotation = Quaternion.
+            LookRotation(transform.TransformDirection(triangles[index].normal));
+        
+        Transform tr = Instantiate(constructionSign, Vector3.zero, rotation,
             buildingsParent).transform;
         tr.localPosition = GetTriangleCenterPoint(index);
         tr.transform.Rotate(0, 0, RandomGenerator.GetRandomValueInRange(0, 360));
 
         triangles[index].constructionSign = tr.gameObject;
         triangles[index].constructionText = tr.GetChild(0).GetChild(0).GetComponent<TMP_Text>();
+
+        switch (triangles[index].constructingBuilding)
+        {
+            case Building.House:
+                triangles[index].constructionGoal = 6;
+                break;
+            
+            case Building.Hangar:
+                triangles[index].constructionGoal = 9;
+                break;
+            
+            case Building.Rocket:
+                triangles[index].constructionGoal = 15;
+                break;
+        }
     }
 
     public void UpdateConstructionSign(int index)
     {
-        triangles[index].constructionText.text =  triangles[index].constructionAmount + "/3";
+        triangles[index].constructionText.text =  triangles[index].constructionAmount + "/" + triangles[index].constructionGoal;
+    }
+    
+    public void UpdateHangarsTexts()
+    {
+        foreach (var text in hangarTexts)
+        {
+            text.text = hangarRessourceAmount.ToString();
+        }
     }
 }
 
@@ -1134,6 +1171,7 @@ public class Triangle
     public List<Vector3Int> elevationTriangle = new List<Vector3Int>();
     public int heightLevel = 0;
     public int treeLevel = 0;
+    public List<GameObject> trees = new List<GameObject>(0);
 
     public List<int> explorersOnTriangle = new List<int>();
 
@@ -1141,7 +1179,7 @@ public class Triangle
     public bool constructing;
     public Building constructingBuilding = Building.None;
     public GameObject constructionSign;
-    public int constructionAmount;
+    public int constructionAmount,constructionGoal;
     public TMP_Text constructionText;
 }
 

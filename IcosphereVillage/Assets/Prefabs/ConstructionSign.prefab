@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4001924027188914691}
   - component: {fileID: 2357238803907820366}
+  - component: {fileID: 2122066667594653205}
   m_Layer: 0
   m_Name: ConstructionIcon
   m_TagString: Untagged
@@ -85,6 +86,19 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &2122066667594653205
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1190436195524318606}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0af57722d9239d4b8bc400766c663ee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  iconSize: 0.01
 --- !u!1 &4695828180905473412
 GameObject:
   m_ObjectHideFlags: 0
