@@ -10,7 +10,7 @@ public class PlayerController : MonoSingleton<PlayerController>
     [SerializeField] private Planet currentPlanet;
 
     public bool isActive;
-    
+
     // Rotation
     private Vector2 mouseMove;
     private bool isDraggingPlanet;
@@ -26,6 +26,10 @@ public class PlayerController : MonoSingleton<PlayerController>
     private float currentDistance;
     private Vector2 scroll;
 
+    // Explorer Selection
+    public Color selectedColor;
+    public Color unselectedColor;
+    
     public void Initialize(Planet target)
     {
         currentPlanet = target;
@@ -55,6 +59,13 @@ public class PlayerController : MonoSingleton<PlayerController>
         if (!ctx.performed) return;
         scroll = ctx.ReadValue<Vector2>();
         SetDistance(-scroll.y);
+    }
+
+    public void OnClick(InputAction.CallbackContext ctx)
+    {
+        if (!isActive) return;
+        if (!ctx.performed) return;
+        ClickOnTile();
     }
 
     private void Update()
@@ -95,9 +106,12 @@ public class PlayerController : MonoSingleton<PlayerController>
         currentPlanet = WorldManager.instance.GetPlanet(i);
     }
 
+    public int currentTriangleIndex = -1;
     public Triangle currentTriangle;
     public Transform cursor;
     public MeshFilter cursorFilter;
+    private Mesh cursorMesh;
+    public ExplorerBehaviour selectedExplorer;
 
     public void DetectCurrentTriangle()
     {
@@ -106,32 +120,51 @@ public class PlayerController : MonoSingleton<PlayerController>
 
         //cursor.position = hit.point;
 
-        foreach (var triangle in currentPlanet.triangles)
+        Triangle triangle;
+        for (int i = 0; i < currentPlanet.triangles.Count; i++)
         {
-            if (IsCursorOverTriangle(triangle, hit.normal))
+            triangle = currentPlanet.triangles[i];
+            if (IsCursorOverTriangle(triangle, hit.normal, hit.point))
             {
                 currentTriangle = triangle;
+                currentTriangleIndex = i;
                 cursor.position = currentPlanet.transform.TransformPoint(Vector3.zero);
                 return;
             }
         }
-
+        
         currentTriangle = null;
+        currentTriangleIndex = -1;
     }
 
-    public bool IsCursorOverTriangle(Triangle triangle, Vector3 normal)
+    public bool IsCursorOverTriangle(Triangle triangle, Vector3 normal, Vector3 point)
     {
-        Vector3 recalculatedNormal = currentPlanet.transform.TransformPoint(triangle.normal);
+        Vector3 recalculatedNormal = currentPlanet.transform.TransformPoint(triangle.elevationNormal);
+        Vector3 recalculatedCenter = currentPlanet.transform.
+            TransformPoint(triangle.centralPoint + triangle.normal * triangle.heightLevel);
 
-        if (math.dot(normal, recalculatedNormal) >= 0.999) return true;
+        bool dotTest = math.dot(normal, recalculatedNormal) >= 0.999;
+        bool distanceTest = Vector3.Distance(recalculatedCenter, point) < 1;
+
+        if (distanceTest)
+        {
+            Debug.DrawLine(point, currentPlanet.transform.
+                TransformPoint(triangle.centralPoint), Color.red);
+        }
+        
+        if (dotTest) return true;
         return false;
     }
 
-    private Mesh cursorMesh;
-
     public void DrawCursor()
     {
-        if (currentTriangle == null || currentPlanet == null) return;
+        if (currentTriangleIndex == -1)
+        {
+            cursorFilter.mesh = null;
+            //cursorFilter.mesh = cursorMesh;
+
+            return;
+        }
 
         cursorFilter.mesh = null;
 
@@ -149,13 +182,19 @@ public class PlayerController : MonoSingleton<PlayerController>
             v2 = currentPlanet.transform.TransformPoint(currentPlanet.vertices[currentTriangle.indices[1]]);
             v3 = currentPlanet.transform.TransformPoint(currentPlanet.vertices[currentTriangle.indices[2]]);
             */
-            
-            v1 = currentPlanet.transform.TransformPoint(currentPlanet.vertices[currentTriangle.elevationTriangle[^1].x]);
-            v2 = currentPlanet.transform.TransformPoint(currentPlanet.vertices[currentTriangle.elevationTriangle[^1].y]);
-            v3 = currentPlanet.transform.TransformPoint(currentPlanet.vertices[currentTriangle.elevationTriangle[^1].z]);
-            
+
+            v1 = currentPlanet.transform.TransformPoint(
+                currentPlanet.vertices[currentTriangle.elevationTriangle[^1].x]);
+            v2 = currentPlanet.transform.TransformPoint(
+                currentPlanet.vertices[currentTriangle.elevationTriangle[^1].y]);
+            v3 = currentPlanet.transform.TransformPoint(
+                currentPlanet.vertices[currentTriangle.elevationTriangle[^1].z]);
         }
-        
+
+        v1 += currentPlanet.transform.TransformPoint(currentTriangle.elevationNormal * 0.1f);
+        v2 += currentPlanet.transform.TransformPoint(currentTriangle.elevationNormal * 0.1f);
+        v3 += currentPlanet.transform.TransformPoint(currentTriangle.elevationNormal * 0.1f);
+
         Vector3[] vertices = new Vector3[]
         {
             v1, v2, v3
@@ -168,5 +207,36 @@ public class PlayerController : MonoSingleton<PlayerController>
         cursorMesh.RecalculateNormals();
 
         cursorFilter.mesh = cursorMesh;
+    }
+
+    private void ClickOnTile()
+    {
+        if (currentTriangle == null || currentPlanet == null) return;
+
+        if (selectedExplorer == null)
+        {
+            if (currentTriangle.explorersOnTriangle.Count > 0)
+            {
+                SetSelectedExplorer();
+            }
+        }
+        else
+        {
+            selectedExplorer.TargetTile(currentTriangleIndex);
+            UnSelectExplorer();
+        }
+    }
+
+    private void SetSelectedExplorer()
+    {
+        int index = currentTriangle.explorersOnTriangle[0];
+        selectedExplorer = WorldManager.instance.GetExplorer(index);
+        selectedExplorer.Select();
+    }
+
+    private void UnSelectExplorer()
+    {
+        selectedExplorer.UnSelect();
+        selectedExplorer = null;
     }
 }

@@ -15,7 +15,6 @@ public class ExplorerBehaviour : MonoBehaviour
     [SerializeField] private Planet home;
     [SerializeField] private float jumpDuration = 0.1f;
     [SerializeField] private int locationIndex;
-    [SerializeField] private int DEBUG_Target;
     [SerializeField] private SpriteRenderer icon;
     public void Initialize(Planet home, int startLocationIndex)
     {
@@ -28,18 +27,29 @@ public class ExplorerBehaviour : MonoBehaviour
 
         Debug.Log("index is " + index);
     }
-    
-    [ContextMenu("Go on target")]
-    public async void Init()
+
+    public void Select()
     {
-        var data = CalculatePathFinding(DEBUG_Target);
+        icon.color = PlayerController.instance.selectedColor;
+        UIManager.instance.SelectExplorerGui(index);
+    }
+
+    public void UnSelect()
+    {
+        icon.color = PlayerController.instance.unselectedColor;
+        UIManager.instance.UnSelectExplorerGui();
+    }
+    
+    public async void TargetTile(int newLocation)
+    {
+        var data = CalculatePathFinding(newLocation);
         if (data == null)
         {
             Debug.LogWarning("You can't go there");
             return;
         }
 
-        int[] reversePath = RecalculatePathFinding(DEBUG_Target, data);
+        int[] reversePath = RecalculatePathFinding(newLocation, data);
         await MoveToTargetPoint(reversePath);
     }
 
