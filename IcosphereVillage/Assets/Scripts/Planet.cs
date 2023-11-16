@@ -46,7 +46,7 @@ public class Planet : MonoBehaviour
 
     public List<Color> vertexColors = new List<Color>();
 
-    [SerializeField] private GameObject hangar,house;
+    [SerializeField] private GameObject hangar,house,rocket;
     [SerializeField] private ExplorerBehaviour explorer1, explorer2;
 
     [Header("BIOME")] 
@@ -100,8 +100,8 @@ public class Planet : MonoBehaviour
         RandomGenerator.SetSeed(seed);
 
         subdivisions = RandomGenerator.GetRandomValueInt(2, 4);
-        if (subdivisions == 3) size = 3;
-        else size = 1.5f;
+        if (subdivisions == 3) size = 4f;
+        else size = 1f;
         
         // MAX HEIGHT DE 2 A 5
         maxHeight = RandomGenerator.GetRandomValueInt(2, 6);
@@ -240,6 +240,7 @@ public class Planet : MonoBehaviour
         SetHangar(out int hangarIndex);
         CreateFirstExplorers(hangarIndex);
 
+
         CreateAllRectangles();
 
         Mesh mesh = new Mesh();
@@ -258,6 +259,12 @@ public class Planet : MonoBehaviour
         filter.mesh = mesh;
 
         GetComponent<MeshCollider>().sharedMesh = mesh;
+        
+        for (int i = 0; i < triangles.Count; i++)
+        {
+            CreateWaterPlatform(i);
+            CreateBuilding(i, Building.House);
+        }
     }
 
     #region Elevation
@@ -1045,6 +1052,37 @@ public class Planet : MonoBehaviour
                 3;
         
     }
+
+    void CreateWaterPlatform(int index)
+    {
+        if (triangles[index].heightLevel >= waterLevel) return;
+
+        triangles[index].building = Building.Bridge;
+        triangles[index].heightLevel = waterLevel;
+        Transform tr = Instantiate(biome.waterPlatform, Vector3.zero, Quaternion.LookRotation(triangles[index].normal),
+            buildingsParent).transform;
+        tr.localPosition = GetTriangleCenterPoint(index) - triangles[index].normal * 0.2f * heightSize;
+        tr.transform.Rotate(0,0,RandomGenerator.GetRandomValueInRange(0, 360));
+    }
+    
+    void CreateBuilding(int index,Building building)
+    {
+        if (triangles[index].heightLevel < waterLevel || triangles[index].building != Building.None || triangles[index].treeLevel > 0) return;
+
+        triangles[index].building = building;
+
+        GameObject prefab = building switch
+        {
+            Building.House => house,
+            Building.Hangar => hangar,
+            Building.Rocket => rocket,
+        };
+        
+        Transform tr = Instantiate(prefab, Vector3.zero, Quaternion.LookRotation(triangles[index].normal),
+            buildingsParent).transform;
+        tr.localPosition = GetTriangleCenterPoint(index);
+        tr.transform.Rotate(0,0,RandomGenerator.GetRandomValueInRange(0, 360));
+    }
 }
 
 [Serializable]
@@ -1062,7 +1100,7 @@ public class Triangle
 
     public List<int> explorersOnTriangle = new List<int>();
 
-    public Building building;
+    public Building building = Building.None;
 }
 
 [Serializable]

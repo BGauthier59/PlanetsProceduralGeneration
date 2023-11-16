@@ -54,6 +54,7 @@ MonoBehaviour:
       m_ColorSpace: -1
       m_NumColorKeys: 2
       m_NumAlphaKeys: 2
+    materialIndex: 0
   - prefab: {fileID: 222292335441431702, guid: 44a0a12a18f3d534da87600e9f20aae8, type: 3}
     colorGradient:
       serializedVersion: 2
@@ -85,6 +86,7 @@ MonoBehaviour:
       m_ColorSpace: -1
       m_NumColorKeys: 2
       m_NumAlphaKeys: 2
+    materialIndex: 0
   - prefab: {fileID: 4002803810739089375, guid: 3a4b18a6f2e79cc4e8d0518e0324b7fd,
       type: 3}
     colorGradient:
@@ -117,3 +119,6 @@ MonoBehaviour:
       m_ColorSpace: -1
       m_NumColorKeys: 2
       m_NumAlphaKeys: 2
+    materialIndex: 0
+  waterPlatform: {fileID: 6154231884391215448, guid: 604fd768f0c001649b74d234a10f4b1d,
+    type: 3}

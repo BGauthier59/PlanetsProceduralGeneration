@@ -120,3 +120,5 @@ MonoBehaviour:
       m_NumColorKeys: 2
       m_NumAlphaKeys: 2
     materialIndex: 2
+  waterPlatform: {fileID: 7479928330648698801, guid: 3ec6b2adc55ee6b4d88c91964f3574c1,
+    type: 3}

@@ -54,6 +54,7 @@ MonoBehaviour:
       m_ColorSpace: -1
       m_NumColorKeys: 2
       m_NumAlphaKeys: 2
+    materialIndex: 0
   - prefab: {fileID: 4908968899173395347, guid: a291d3cfc3048864fb06ad4b64690195,
       type: 3}
     colorGradient:
@@ -86,3 +87,6 @@ MonoBehaviour:
       m_ColorSpace: -1
       m_NumColorKeys: 2
       m_NumAlphaKeys: 2
+    materialIndex: 0
+  waterPlatform: {fileID: 2221128290191577883, guid: 27876e934e99d3042a7f81d792517421,
+    type: 3}
