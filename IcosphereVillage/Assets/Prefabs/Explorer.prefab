@@ -339,6 +339,7 @@ MonoBehaviour:
   jumpDuration: 0.2
   locationIndex: 0
   icon: {fileID: 6603077448177123573}
+  iconSize: 0.01
 --- !u!1 &3744011243271211796
 GameObject:
   m_ObjectHideFlags: 0

@@ -11,11 +11,17 @@ using UnityEngine;
 public class ExplorerBehaviour : MonoBehaviour
 {
     private int index;
+    
     [SerializeField] private Transform explorer;
     [SerializeField] private Planet home;
     [SerializeField] private float jumpDuration = 0.1f;
     [SerializeField] private int locationIndex;
     [SerializeField] private SpriteRenderer icon;
+    [SerializeField] private float iconSize = 0.1f;
+
+    [SerializeField] private ExplorerTask task;
+    [SerializeField] private int taskTriangle;
+    
     public void Initialize(Planet home, int startLocationIndex)
     {
         this.home = home;
@@ -30,23 +36,32 @@ public class ExplorerBehaviour : MonoBehaviour
 
     public void Select()
     {
-        icon.color = PlayerController.instance.selectedColor;
+        icon.sprite = PlayerController.instance.actionSprites[1];
         UIManager.instance.SelectExplorerGui(index);
     }
 
     public void UnSelect()
     {
-        icon.color = PlayerController.instance.unselectedColor;
         UIManager.instance.UnSelectExplorerGui();
     }
     
     public async void TargetTile(int newLocation)
     {
+
         var data = CalculatePathFinding(newLocation);
         if (data == null)
         {
             Debug.LogWarning("You can't go there");
             return;
+        }
+
+        if (home.triangles[newLocation].treeLevel > 0)
+        {
+            ChangeTask(ExplorerTask.Recolting);
+        }
+        else
+        {
+            ChangeTask(ExplorerTask.None);
         }
 
         int[] reversePath = RecalculatePathFinding(newLocation, data);
@@ -156,7 +171,7 @@ public class ExplorerBehaviour : MonoBehaviour
             Quaternion nextRot = Quaternion.LookRotation(next.normal);
             
             p3 = explorer.localPosition + current.normal * 0.4f;
-            p4 = next.centralPoint + next.normal * next.heightLevel * home.heightSize;
+            p4 = home.GetTriangleCenterPoint(locationIndex);
 
             float timer = 0;
             while (timer < jumpDuration)
@@ -177,7 +192,7 @@ public class ExplorerBehaviour : MonoBehaviour
     public void SetPositionOnTriangle()
     {
         Triangle triangle = home.triangles[locationIndex];
-        explorer.localPosition = triangle.centralPoint + triangle.normal * triangle.heightLevel * home.heightSize;
+        explorer.localPosition = home.GetTriangleCenterPoint(locationIndex);
         explorer.localRotation = Quaternion.LookRotation(triangle.normal);
         Debug.Log(index + " set on " + locationIndex);
         triangle.explorersOnTriangle.Add(index);
@@ -200,5 +215,39 @@ public class ExplorerBehaviour : MonoBehaviour
     private void Update()
     {
         icon.transform.rotation = Quaternion.Euler(0,0,0);
+        icon.transform.localScale = Vector3.one *
+                                    ((1 * Vector3.Distance(icon.transform.position,
+                                        PlayerController.instance.cam.transform.position)) * iconSize);
     }
+
+    private void ChangeTask(ExplorerTask newTask)
+    {
+        task = newTask;
+        switch (newTask)
+        {
+            case ExplorerTask.None:
+                icon.sprite = PlayerController.instance.actionSprites[0];
+                break;
+            
+            case ExplorerTask.Recolting:
+                icon.sprite = PlayerController.instance.actionSprites[2];
+                break;
+            
+            case ExplorerTask.Building:
+                icon.sprite = PlayerController.instance.actionSprites[3];
+                break;
+            
+            case ExplorerTask.Cargoing:
+                icon.sprite = PlayerController.instance.actionSprites[4];
+                break;
+        }
+    }
+}
+
+public enum ExplorerTask
+{
+    None,
+    Recolting,
+    Building,
+    Cargoing,
 }

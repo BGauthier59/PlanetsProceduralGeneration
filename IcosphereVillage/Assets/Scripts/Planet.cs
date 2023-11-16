@@ -254,12 +254,6 @@ public class Planet : MonoBehaviour
         filter.mesh = mesh;
 
         GetComponent<MeshCollider>().sharedMesh = mesh;
-        
-        for (int i = 0; i < triangles.Count; i++)
-        {
-            CreateWaterPlatform(i);
-            CreateBuilding(i, Building.House);
-        }
     }
 
     #region Elevation

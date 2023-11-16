@@ -18,7 +18,7 @@ public class PlayerController : MonoSingleton<PlayerController>
 
     // Zoom
     [SerializeField] private Transform camera;
-    private Camera cam;
+    public Camera cam;
     [SerializeField] private float baseDistance;
     [SerializeField] private Vector2 minMaxDistance;
     [SerializeField] private float cameraSpeed;
@@ -29,6 +29,7 @@ public class PlayerController : MonoSingleton<PlayerController>
     // Explorer Selection
     public Color selectedColor;
     public Color unselectedColor;
+    public Sprite[] actionSprites;
     
     public void Initialize(Planet target)
     {
