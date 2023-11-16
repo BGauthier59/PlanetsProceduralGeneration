@@ -22,6 +22,7 @@ public class Planet : MonoBehaviour
 
     public int ressourceType1,ressourceType2;
     public Transform treeParent;
+    public Transform buildingsParent;
 
     public float size;
     public float heightSize, elevationScaleFactor;
@@ -45,7 +46,7 @@ public class Planet : MonoBehaviour
 
     public List<Color> vertexColors = new List<Color>();
 
-    [SerializeField] private Transform hangar;
+    [SerializeField] private GameObject hangar,house;
     [SerializeField] private ExplorerBehaviour explorer1, explorer2;
 
     [Header("BIOME")] 
@@ -888,16 +889,26 @@ public class Planet : MonoBehaviour
         {
             triangle = triangles[0];
         }
-        
-        hangar.localPosition = triangle.centralPoint + triangle.normal * triangle.heightLevel * heightSize;
-        hangar.localRotation = Quaternion.LookRotation(triangle.normal);
-        
+
+        Vector3 pos = GetTriangleCenterPoint(hangarIndex);
+
+        triangle.building = Building.Hangar;
+        Transform tr = Instantiate(hangar, Vector3.zero, Quaternion.LookRotation(triangle.normal),buildingsParent).transform;
+
+        tr.localPosition = pos;
+
     }
 
     void CreateFirstExplorers(int tri)
     {
         explorer1.Initialize(this, triangles[tri].neighbourA);
+
         explorer2.Initialize(this, triangles[tri].neighbourB);
+
+        triangles[triangles[tri].neighbourC].building = Building.House;
+        Transform tr = Instantiate(house, Vector3.zero, 
+            Quaternion.LookRotation(triangles[triangles[tri].neighbourC].normal),buildingsParent).transform;
+        tr.localPosition = GetTriangleCenterPoint(triangles[tri].neighbourC);
     }
 
     #endregion
@@ -984,6 +995,25 @@ public class Planet : MonoBehaviour
             //Gizmos.DrawSphere(tri.centralPoint, 0.1f);
         }
     }
+
+    Vector3 GetTriangleCenterPoint(int index)
+    {
+        if (triangles[index].building == Building.Bridge)
+        {
+            return triangles[index].centralPoint + triangles[index].normal * triangles[index].heightLevel * heightSize;
+        }
+        
+        if (triangles[index].heightLevel == 0)
+        {
+            return triangles[index].centralPoint;
+        }
+        
+        return (vertices[triangles[index].elevationTriangle[triangles[index].heightLevel - 1].x] +
+                vertices[triangles[index].elevationTriangle[triangles[index].heightLevel - 1].y] + 
+                vertices[triangles[index].elevationTriangle[triangles[index].heightLevel - 1].z]) /
+                3;
+        
+    }
 }
 
 [Serializable]
@@ -1000,6 +1030,8 @@ public class Triangle
     public int treeLevel = 0;
 
     public List<int> explorersOnTriangle = new List<int>();
+
+    public Building building;
 }
 
 [Serializable]
@@ -1013,4 +1045,13 @@ public struct Rectangle
 {
     public int a, b, c, d;
     public int elevation;
+}
+
+public enum Building
+{
+    House,
+    Hangar,
+    Rocket,
+    Bridge,
+    None
 }

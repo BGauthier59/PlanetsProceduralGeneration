@@ -171,6 +171,7 @@ MonoBehaviour:
   planetGuiLayout: {fileID: 2020749973}
   planetGuiPrefab: {fileID: 7104524685245847906, guid: 682fc0ac4d445a642b3151f2a84272fd,
     type: 3}
+  infoText: {fileID: 0}
 --- !u!1 &176232013
 GameObject:
   m_ObjectHideFlags: 0
@@ -352,6 +353,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentPlanet: {fileID: 0}
+  isActive: 0
   rotateSensibility: 0.3
   camera: {fileID: 1674502942}
   baseDistance: 10
@@ -368,6 +370,8 @@ MonoBehaviour:
     elevationTriangle: []
     heightLevel: 0
     treeLevel: 0
+    explorersOnTriangle: 
+    building: 0
   cursor: {fileID: 487081816}
   cursorFilter: {fileID: 487081818}
 --- !u!114 &371637860
@@ -444,6 +448,10 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: 508de902-7f84-4d6e-8801-fd44602e4cf7
     m_ActionName: Player/Zoom[/Mouse/scroll]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 0a9457c7-8208-4a32-acdd-5e1bc80f8ead
+    m_ActionName: Player/Click[/Mouse/leftButton]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player
@@ -917,9 +925,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   allPlanets: []
+  allExplorers: []
   planetPrefab: {fileID: 3254101452558638239, guid: c15a4d7057260e44199931fe0876fedb,
     type: 3}
-  globalSeed: 922407865
+  globalSeed: 2
 --- !u!4 &1093796947
 Transform:
   m_ObjectHideFlags: 0

@@ -83,6 +83,37 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &1027050710757933998
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7678928676564947893}
+  m_Layer: 0
+  m_Name: BuildingParent
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7678928676564947893
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1027050710757933998}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 9042101294885135624}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2300671878983183884
 GameObject:
   m_ObjectHideFlags: 0
@@ -149,7 +180,7 @@ Transform:
   m_Children:
   - {fileID: 4190450064442439710}
   - {fileID: 5417725066891541343}
-  - {fileID: 2450179829027447185}
+  - {fileID: 7678928676564947893}
   - {fileID: 1833113731613326285}
   - {fileID: 3796446328533330627}
   m_Father: {fileID: 0}
@@ -227,6 +258,7 @@ MonoBehaviour:
   ressourceType1: 0
   ressourceType2: 0
   treeParent: {fileID: 5417725066891541343}
+  buildingsParent: {fileID: 7678928676564947893}
   size: 3
   heightSize: 0.3
   elevationScaleFactor: 0.75
@@ -238,7 +270,8 @@ MonoBehaviour:
   waterLevel: 0
   waterSphere: {fileID: 4190450064442439710}
   vertexColors: []
-  hangar: {fileID: 2450179829027447185}
+  hangar: {fileID: 3565732001923508630, guid: 0aebb486f11dd2d49b7006220e15e7e3, type: 3}
+  house: {fileID: 3565732001923508630, guid: 959ecf4f7b22e4c4a9c827cabe34b6e7, type: 3}
   explorer1: {fileID: 1974642023368158110}
   explorer2: {fileID: 3943040686702049936}
   biomes:
@@ -275,80 +308,6 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 0}
---- !u!1001 &3238465822584297972
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 9042101294885135624}
-    m_Modifications:
-    - target: {fileID: 1076815591523973221, guid: 0aebb486f11dd2d49b7006220e15e7e3,
-        type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1076815591523973221, guid: 0aebb486f11dd2d49b7006220e15e7e3,
-        type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1076815591523973221, guid: 0aebb486f11dd2d49b7006220e15e7e3,
-        type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1076815591523973221, guid: 0aebb486f11dd2d49b7006220e15e7e3,
-        type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1076815591523973221, guid: 0aebb486f11dd2d49b7006220e15e7e3,
-        type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1076815591523973221, guid: 0aebb486f11dd2d49b7006220e15e7e3,
-        type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1076815591523973221, guid: 0aebb486f11dd2d49b7006220e15e7e3,
-        type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1076815591523973221, guid: 0aebb486f11dd2d49b7006220e15e7e3,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1076815591523973221, guid: 0aebb486f11dd2d49b7006220e15e7e3,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1076815591523973221, guid: 0aebb486f11dd2d49b7006220e15e7e3,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3565732001923508630, guid: 0aebb486f11dd2d49b7006220e15e7e3,
-        type: 3}
-      propertyPath: m_Name
-      value: Hangar
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 0aebb486f11dd2d49b7006220e15e7e3, type: 3}
---- !u!4 &2450179829027447185 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 1076815591523973221, guid: 0aebb486f11dd2d49b7006220e15e7e3,
-    type: 3}
-  m_PrefabInstance: {fileID: 3238465822584297972}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &5718499725261935496
 PrefabInstance:
   m_ObjectHideFlags: 0
