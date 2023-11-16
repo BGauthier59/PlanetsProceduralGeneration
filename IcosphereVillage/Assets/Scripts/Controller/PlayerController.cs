@@ -150,11 +150,7 @@ public class PlayerController : MonoSingleton<PlayerController>
     {
         Vector3 recalculatedNormal = (currentPlanet.transform.TransformDirection(triangle.elevationNormal));
         Vector3 recalculatedCenter = currentPlanet.transform.TransformPoint(currentPlanet.GetTriangleCenterPoint(i));
-        
-        Debug.DrawRay(recalculatedCenter, 
-            recalculatedNormal, 
-            Color.magenta);
-        
+ 
         bool dotTest = math.dot(normal, recalculatedNormal) >= 0.999;
         if (dotTest) return true;
         return false;
