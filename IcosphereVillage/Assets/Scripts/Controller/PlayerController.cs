@@ -139,7 +139,7 @@ public class PlayerController : MonoSingleton<PlayerController>
 
     public bool IsCursorOverTriangle(Triangle triangle, Vector3 normal, Vector3 point)
     {
-        Vector3 recalculatedNormal = currentPlanet.transform.TransformPoint(triangle.normal);
+        Vector3 recalculatedNormal = currentPlanet.transform.TransformPoint(triangle.elevationNormal);
         Vector3 recalculatedCenter = currentPlanet.transform.
             TransformPoint(triangle.centralPoint + triangle.normal * triangle.heightLevel);
 
@@ -190,6 +190,10 @@ public class PlayerController : MonoSingleton<PlayerController>
             v3 = currentPlanet.transform.TransformPoint(
                 currentPlanet.vertices[currentTriangle.elevationTriangle[^1].z]);
         }
+
+        v1 += currentPlanet.transform.TransformPoint(currentTriangle.elevationNormal * 0.1f);
+        v2 += currentPlanet.transform.TransformPoint(currentTriangle.elevationNormal * 0.1f);
+        v3 += currentPlanet.transform.TransformPoint(currentTriangle.elevationNormal * 0.1f);
 
         Vector3[] vertices = new Vector3[]
         {

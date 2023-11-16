@@ -59,6 +59,12 @@ public class Planet : MonoBehaviour
 
     private void Update()
     {
+        for (int i = 0; i < triangles.Count; i++)
+        {
+            Debug.DrawRay(GetTriangleCenterPoint(i), triangles[i].elevationNormal, Color.magenta);
+
+        }
+        
         /*
         foreach (var tri in subdividedTris)
         {
@@ -356,6 +362,8 @@ public class Planet : MonoBehaviour
                 }
             }
         }
+
+        foreach (var tri in triangles) SetElevationNormal(tri);
     }
 
     void FormElevationGroup(int[] vertexTris, int origin, int heightLvl, ref List<int> group)
@@ -548,6 +556,29 @@ public class Planet : MonoBehaviour
     void SetNormal(Triangle tri)
     {
         tri.normal = tri.centralPoint.normalized;
+    }
+
+    void SetElevationNormal(Triangle tri)
+    {
+        if (tri.heightLevel == 0)
+        {
+            tri.elevationNormal = tri.normal;
+            return;
+        }
+        
+        Vector3Int elevationTriangle = tri.elevationTriangle[^1];
+
+        Vector3 x = vertices[elevationTriangle.x];
+        Vector3 y = vertices[elevationTriangle.y];
+        Vector3 z = vertices[elevationTriangle.z];
+
+        Vector3 a = y - x;
+        Vector3 b = z - x;
+
+        tri.elevationNormal = new Vector3(
+            a.y * b.z - a.z * b.y,
+            a.z * b.x - a.x * b.z,
+            a.x * b.y - a.y * b.x).normalized;
     }
 
     private void LinkTriangles(int a, int b)
@@ -1021,7 +1052,7 @@ public class Triangle
 {
     public int[] indices = new int[3] { -1, -1, -1 };
     public Vector3 centralPoint;
-    public Vector3 normal;
+    public Vector3 normal, elevationNormal;
     public int neighbourA, neighbourB, neighbourC;
     public Dictionary<int, int> vertexToChildren = new Dictionary<int, int>();
 
