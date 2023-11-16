@@ -171,6 +171,7 @@ MonoBehaviour:
   planetGuiLayout: {fileID: 2020749973}
   planetGuiPrefab: {fileID: 7104524685245847906, guid: 682fc0ac4d445a642b3151f2a84272fd,
     type: 3}
+  infoText: {fileID: 1003416435}
 --- !u!1 &176232013
 GameObject:
   m_ObjectHideFlags: 0
@@ -359,6 +360,9 @@ MonoBehaviour:
   minMaxDistance: {x: -3, y: 13}
   cameraSpeed: 5
   stepValue: 0.01
+  selectedColor: {r: 1, g: 0.84189, b: 0, a: 1}
+  unselectedColor: {r: 0.5849056, g: 0.5849056, b: 0.5849056, a: 0.39215687}
+  currentTriangleIndex: 0
   currentTriangle:
     indices: ffffffffffffffffffffffff
     centralPoint: {x: 0, y: 0, z: 0}
@@ -372,6 +376,7 @@ MonoBehaviour:
     explorersOnTriangle: 
   cursor: {fileID: 487081816}
   cursorFilter: {fileID: 487081818}
+  selectedExplorer: {fileID: 0}
 --- !u!114 &371637860
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -446,6 +451,22 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: 508de902-7f84-4d6e-8801-fd44602e4cf7
     m_ActionName: Player/Zoom[/Mouse/scroll]
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 371637859}
+        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
+        m_MethodName: OnClick
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 0a9457c7-8208-4a32-acdd-5e1bc80f8ead
+    m_ActionName: Player/Click[/Mouse/leftButton]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player

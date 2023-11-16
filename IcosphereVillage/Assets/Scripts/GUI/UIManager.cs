@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -11,6 +12,11 @@ public class UIManager : MonoSingleton<UIManager>
     [SerializeField] private TMP_Text infoText;
     
     private static readonly int WaterColor = Shader.PropertyToID("_WaterColor");
+
+    private void Start()
+    {
+        UnSelectExplorerGui();
+    }
 
     public void AddPlanetGui(int newPlanetIndex)
     {
@@ -37,5 +43,10 @@ public class UIManager : MonoSingleton<UIManager>
     public void SelectExplorerGui(int index)
     {
         infoText.text = $"Explorer N°{index} is selected";
+    }
+
+    public void UnSelectExplorerGui()
+    {
+        infoText.text = $"No explorer selected";
     }
 }
