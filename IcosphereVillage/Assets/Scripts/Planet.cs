@@ -51,7 +51,7 @@ public class Planet : MonoBehaviour
     [Header("BIOME")] 
     [SerializeField] private BiomeSO[] biomes;
     public BiomeSO biome;
-
+    
     private void OnValidate()
     {
     }
@@ -998,6 +998,8 @@ public class Triangle
     public List<Vector3Int> elevationTriangle = new List<Vector3Int>();
     public int heightLevel = 0;
     public int treeLevel = 0;
+
+    public List<int> explorersOnTriangle = new List<int>();
 }
 
 [Serializable]

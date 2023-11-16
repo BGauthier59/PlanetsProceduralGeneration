@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class UIManager : MonoSingleton<UIManager>
@@ -7,6 +8,8 @@ public class UIManager : MonoSingleton<UIManager>
     [SerializeField] private PlanetGUI[] allPlanetGuis;
     [SerializeField] private Transform planetGuiLayout;
     [SerializeField] private PlanetGUI planetGuiPrefab;
+    [SerializeField] private TMP_Text infoText;
+    
     private static readonly int WaterColor = Shader.PropertyToID("_WaterColor");
 
     public void AddPlanetGui(int newPlanetIndex)
@@ -29,5 +32,10 @@ public class UIManager : MonoSingleton<UIManager>
         e.a = 1;
         n.Initialize(newPlanetIndex, w, e);
 
+    }
+
+    public void SelectExplorerGui(int index)
+    {
+        infoText.text = $"Explorer N°{index} is selected";
     }
 }

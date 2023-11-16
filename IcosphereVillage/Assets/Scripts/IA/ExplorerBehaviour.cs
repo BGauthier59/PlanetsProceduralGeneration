@@ -10,18 +10,23 @@ using UnityEngine;
 
 public class ExplorerBehaviour : MonoBehaviour
 {
+    private int index;
     [SerializeField] private Transform explorer;
     [SerializeField] private Planet home;
     [SerializeField] private float jumpDuration = 0.1f;
     [SerializeField] private int locationIndex;
     [SerializeField] private int DEBUG_Target;
     [SerializeField] private SpriteRenderer icon;
-    public void Initialize(Planet home, int index)
+    public void Initialize(Planet home, int startLocationIndex)
     {
         this.home = home;
         transform.parent = home.transform;
-        locationIndex = index;
+        locationIndex = startLocationIndex;
+        index = WorldManager.instance.AddExplorer(this);
+        
         SetPositionOnTriangle();
+
+        Debug.Log("index is " + index);
     }
     
     [ContextMenu("Go on target")]
@@ -135,6 +140,7 @@ public class ExplorerBehaviour : MonoBehaviour
             p1 = explorer.localPosition;
             p2 = explorer.localPosition + current.normal * 0.4f;
             
+            LeaveTriangle();
             locationIndex = reversePath[i];
             Triangle next = home.triangles[locationIndex];
             Quaternion nextRot = Quaternion.LookRotation(next.normal);
@@ -163,6 +169,15 @@ public class ExplorerBehaviour : MonoBehaviour
         Triangle triangle = home.triangles[locationIndex];
         explorer.localPosition = triangle.centralPoint + triangle.normal * triangle.heightLevel * home.heightSize;
         explorer.localRotation = Quaternion.LookRotation(triangle.normal);
+        Debug.Log(index + " set on " + locationIndex);
+        triangle.explorersOnTriangle.Add(index);
+    }
+
+    public void LeaveTriangle()
+    {
+        Triangle triangle = home.triangles[locationIndex];
+        Debug.Log(index + " left " + locationIndex);
+        triangle.explorersOnTriangle.Remove(index);
     }
 
     public int[] GetNeighbours(int index)
