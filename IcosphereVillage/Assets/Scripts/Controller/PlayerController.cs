@@ -250,6 +250,7 @@ public class PlayerController : MonoSingleton<PlayerController>
 
     private async void ClickOnTile()
     {
+
         if (currentTriangle == null || currentPlanet == null) return;
 
         switch (currentTriangle.building)
@@ -297,13 +298,22 @@ public class PlayerController : MonoSingleton<PlayerController>
             {
                 selectedExplorer.taskTriangle = currentTriangleIndex;
                 selectedExplorer.ChangeTask(ExplorerTask.Recolting);
+                selectedExplorer.TravelForRecolting();
+                
+            }
+            else if (currentPlanet.triangles[currentTriangleIndex].heightLevel >= currentPlanet.waterLevel)
+            {
+                Debug.Log("TASK SET TO BUILDING");
+                selectedExplorer.taskTriangle = currentTriangleIndex;
+                selectedExplorer.taskBuilding = Building.House;
+                selectedExplorer.ChangeTask(ExplorerTask.Building);
+                selectedExplorer.TravelForBuilding();
             }
             else
             {
                 selectedExplorer.ChangeTask(ExplorerTask.None);
             }
             
-            selectedExplorer.TargetTile(currentTriangleIndex);
             UnSelectExplorer();
             
         }

@@ -361,14 +361,13 @@ MonoBehaviour:
   minMaxDistance: {x: -3, y: 13}
   cameraSpeed: 5
   stepValue: 0.01
-  selectedColor: {r: 1, g: 0.84189, b: 0, a: 1}
-  unselectedColor: {r: 0.5849056, g: 0.5849056, b: 0.5849056, a: 0.39215687}
   actionSprites:
   - {fileID: 21300000, guid: 3434787beb31bec4b8c013ac23848b20, type: 3}
   - {fileID: 21300000, guid: 92cee353c2794ad41a2cf91dc044cfb8, type: 3}
   - {fileID: 21300000, guid: f01143e258d639e4394ad25281c49d9c, type: 3}
   - {fileID: 21300000, guid: a6f14ca703647b04aa825a5c84fe1f40, type: 3}
   - {fileID: 21300000, guid: f1a127f2dca48644784ea02427e9136a, type: 3}
+  holdDuration: 0
   currentTriangleIndex: 0
   currentTriangle:
     indices: ffffffffffffffffffffffff
@@ -383,7 +382,10 @@ MonoBehaviour:
     treeLevel: 0
     explorersOnTriangle: 
     building: 4
-  cursor: {fileID: 487081816}
+    constructing: 0
+    constructingBuilding: 4
+    constructionSign: {fileID: 0}
+    constructionAmount: 0
   cursorFilter: {fileID: 487081818}
   selectedExplorer: {fileID: 0}
 --- !u!114 &371637860
@@ -1088,7 +1090,8 @@ MonoBehaviour:
   allExplorers: []
   planetPrefab: {fileID: 3254101452558638239, guid: c15a4d7057260e44199931fe0876fedb,
     type: 3}
-  globalSeed: 922407865
+  globalSeed: 5
+  DEBUG_RocketPos: 0
 --- !u!4 &1093796947
 Transform:
   m_ObjectHideFlags: 0

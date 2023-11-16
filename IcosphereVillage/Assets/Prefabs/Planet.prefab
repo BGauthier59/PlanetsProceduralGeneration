@@ -268,13 +268,17 @@ MonoBehaviour:
   noiseSize: 0.3
   forestNoiseSize: 0.5
   waterLevel: 0
+  hangarRessourceAmount: 0
   waterSphere: {fileID: 4190450064442439710}
   vertexColors: []
   hangar: {fileID: 3565732001923508630, guid: 0aebb486f11dd2d49b7006220e15e7e3, type: 3}
   house: {fileID: 3565732001923508630, guid: 959ecf4f7b22e4c4a9c827cabe34b6e7, type: 3}
   rocket: {fileID: 8771618361602881056, guid: cf8eb7d3d4996654a9456ddf9d339eeb, type: 3}
+  constructionSign: {fileID: 4695828180905473412, guid: 82fcffaf2abca3f4abf365318bea1446,
+    type: 3}
   explorer1: {fileID: 1974642023368158110}
   explorer2: {fileID: 3943040686702049936}
+  hangarIndex: 0
   biomes:
   - {fileID: 11400000, guid: 0c9bc6e19b470a340a26801e66affdaa, type: 2}
   - {fileID: 11400000, guid: 536478456c8162a4e8ad02bc1dabf948, type: 2}

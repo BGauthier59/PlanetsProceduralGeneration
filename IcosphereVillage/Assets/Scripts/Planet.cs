@@ -35,6 +35,8 @@ public class Planet : MonoBehaviour
 
     public int waterLevel;
 
+    public int hangarRessourceAmount;
+
     [SerializeField] private Transform waterSphere;
 
     public Noise elevationNoise;
@@ -46,7 +48,7 @@ public class Planet : MonoBehaviour
 
     public List<Color> vertexColors = new List<Color>();
 
-    [SerializeField] private GameObject hangar, house, rocket;
+    [SerializeField] private GameObject hangar, house, rocket, constructionSign;
     [SerializeField] private ExplorerBehaviour explorer1, explorer2;
     public Dictionary<int, Transform> rocketByIndex = new Dictionary<int, Transform>();
     public int hangarIndex;
@@ -1085,6 +1087,26 @@ public class Planet : MonoBehaviour
             rocketByIndex.Add(index, tr);
         }
     }
+    
+    public void CreateConstructionSign(int index)
+    {
+        if (triangles[index].heightLevel < waterLevel || triangles[index].building != Building.None ||
+            triangles[index].treeLevel > 0) return;
+        
+
+        Transform tr = Instantiate(constructionSign, Vector3.zero, Quaternion.LookRotation(triangles[index].normal),
+            buildingsParent).transform;
+        tr.localPosition = GetTriangleCenterPoint(index);
+        tr.transform.Rotate(0, 0, RandomGenerator.GetRandomValueInRange(0, 360));
+
+        triangles[index].constructionSign = tr.gameObject;
+        triangles[index].constructionText = tr.GetChild(0).GetChild(0).GetComponent<TMP_Text>();
+    }
+
+    public void UpdateConstructionSign(int index)
+    {
+        triangles[index].constructionText.text =  triangles[index].constructionAmount + "/3";
+    }
 }
 
 [Serializable]
@@ -1103,6 +1125,11 @@ public class Triangle
     public List<int> explorersOnTriangle = new List<int>();
 
     public Building building = Building.None;
+    public bool constructing;
+    public Building constructingBuilding = Building.None;
+    public GameObject constructionSign;
+    public int constructionAmount;
+    public TMP_Text constructionText;
 }
 
 [Serializable]
