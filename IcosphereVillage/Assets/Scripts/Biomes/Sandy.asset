@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a145b00af5db0d343b1730604b5de1f9, type: 3}
   m_Name: Sandy
   m_EditorClassIdentifier: 
+  biomeName: SANDY
   topColor: {r: 0.35686275, g: 0.7372549, b: 0.19607843, a: 0}
   groundColor: {r: 0.93333334, g: 0.7764706, b: 0.24313726, a: 0}
   bottomColor: {r: 0.5647059, g: 0.23137255, b: 0, a: 0}

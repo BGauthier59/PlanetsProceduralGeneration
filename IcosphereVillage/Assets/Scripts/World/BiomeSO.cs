@@ -6,6 +6,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "Biome", menuName = "ScriptableObjects/Biome", order = 1)]
 public class BiomeSO : ScriptableObject
 {
+    public string biomeName;
     public Color topColor;
     public Color groundColor;
     public Color bottomColor;

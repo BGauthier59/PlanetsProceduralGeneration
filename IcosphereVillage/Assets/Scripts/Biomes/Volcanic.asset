@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a145b00af5db0d343b1730604b5de1f9, type: 3}
   m_Name: Volcanic
   m_EditorClassIdentifier: 
+  biomeName: VOLCANO
   topColor: {r: 0.30980393, g: 0.050980393, b: 0.050980393, a: 0}
   groundColor: {r: 0.65882355, g: 0.1882353, b: 0.11372549, a: 0}
   bottomColor: {r: 0.745283, g: 0.24952315, b: 0, a: 0}

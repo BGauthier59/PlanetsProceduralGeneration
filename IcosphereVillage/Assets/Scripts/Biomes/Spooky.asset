@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a145b00af5db0d343b1730604b5de1f9, type: 3}
   m_Name: Spooky
   m_EditorClassIdentifier: 
+  biomeName: SPOOKY
   topColor: {r: 0.5943396, g: 0.16540584, b: 0.39930117, a: 0}
   groundColor: {r: 1, g: 0.4635813, b: 0.109803915, a: 0}
   bottomColor: {r: 0.2924528, g: 0.08414915, b: 0.16350292, a: 0}

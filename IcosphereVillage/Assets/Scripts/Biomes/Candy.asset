@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a145b00af5db0d343b1730604b5de1f9, type: 3}
   m_Name: Candy
   m_EditorClassIdentifier: 
+  biomeName: CANDY
   topColor: {r: 0.9339623, g: 0.82382524, b: 0.923572, a: 0}
   groundColor: {r: 1, g: 0.4292453, b: 0.93572766, a: 0}
   bottomColor: {r: 0.37405908, g: 0.049127813, b: 0.4528302, a: 0}

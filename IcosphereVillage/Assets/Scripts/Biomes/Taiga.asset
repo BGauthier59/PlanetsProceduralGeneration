@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a145b00af5db0d343b1730604b5de1f9, type: 3}
   m_Name: Taiga
   m_EditorClassIdentifier: 
+  biomeName: TAIGA
   topColor: {r: 0.6117647, g: 0.35686275, b: 0.20392157, a: 0}
   groundColor: {r: 0.003921569, g: 0.7647059, b: 0.10980392, a: 0}
   bottomColor: {r: 0.3882353, g: 0.10980392, b: 0.08235294, a: 0}

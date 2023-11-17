@@ -9,6 +9,7 @@ using UnityEngine.InputSystem;
 public class PlayerController : MonoSingleton<PlayerController>
 {
     [SerializeField] private Planet currentPlanet;
+    private int currentPlanetIndex;
     
     public bool isActive;
     
@@ -41,6 +42,7 @@ public class PlayerController : MonoSingleton<PlayerController>
 
     // Rocket
     [SerializeField] private float holdDuration;
+    [SerializeField] private float maxRocketSize;
     private bool isHolding;
     private bool isZoomingRocket;
     private Transform rocket;
@@ -59,6 +61,7 @@ public class PlayerController : MonoSingleton<PlayerController>
         currentPlanet = p;
         minMaxDistanceSub = p.subdivisions == 2 ? minMaxDistanceSub0 : minMaxDistanceSub1;
         SetDistance(0);
+        UIManager.instance.RefreshPlanetInfoGui("WIP", p.biome.biomeName, p.biome.groundColor, currentPlanetIndex + 1, (int)p.seed);
     }
 
     public Planet GetCurrentPlanet => currentPlanet;
@@ -190,6 +193,7 @@ public class PlayerController : MonoSingleton<PlayerController>
 
     public void SetNewTarget(int i)
     {
+        currentPlanetIndex = i;
         SetCurrentPlanet(WorldManager.instance.GetPlanet(i));
     }
 
@@ -216,6 +220,7 @@ public class PlayerController : MonoSingleton<PlayerController>
             {
                 currentTriangle = triangle;
                 currentTriangleIndex = i;
+                UIManager.instance.RefreshCurrentTileInfoGui(currentTriangleIndex, currentTriangle.trees.Count);
                 return;
             }
         }
@@ -227,6 +232,7 @@ public class PlayerController : MonoSingleton<PlayerController>
     {
         currentTriangle = null;
         currentTriangleIndex = -1;
+        UIManager.instance.RefreshCurrentTileInfoGui(currentTriangleIndex, 0);
     }
 
     public bool IsCursorOverTriangle(Triangle triangle, Vector3 normal, Vector3 point, int i)
@@ -332,14 +338,16 @@ public class PlayerController : MonoSingleton<PlayerController>
         if (currentTriangle.building == Building.Rocket)
         {
             int saveIndex = currentTriangleIndex;
+            Transform rocket = currentPlanet.rocketByIndex[saveIndex];
             float holdTimer = 0;
             while (holdTimer < holdDuration)
             {
                 holdTimer += Time.deltaTime;
+                rocket.localScale = Vector3.one * math.lerp(1, maxRocketSize, holdTimer / holdDuration);
                 await Task.Yield();
                 if (!isHolding)
                 {
-                    Debug.Log("stop holding");
+                    rocket.localScale = Vector3.one;
                     return;
                 }
             }

@@ -95,6 +95,10 @@ public class Planet : MonoBehaviour
 
     public async Task Initialize()
     {
+        waterSphere.gameObject.SetActive(false);
+        explorer1.gameObject.SetActive(false);
+        explorer2.gameObject.SetActive(false);
+        
         seed = RandomGenerator.GetRandomSeed();
 
         elevationNoise = new Noise((int)seed);
@@ -245,15 +249,12 @@ public class Planet : MonoBehaviour
             SubdivideSphere();
         }
 
-        Debug.Log(vertices.Count);
-
         SetElevationGrouped();
         SetOrganicDisplacement();
 
         CreateTreesAndRocks();
         SetHangar(out hangarIndex);
         CreateFirstExplorers(hangarIndex);
-
 
         CreateAllRectangles();
 
@@ -271,6 +272,9 @@ public class Planet : MonoBehaviour
 
         mesh.RecalculateNormals();
         filter.mesh = mesh;
+        waterSphere.gameObject.SetActive(true);
+        explorer1.gameObject.SetActive(true);
+        explorer2.gameObject.SetActive(true);
 
         GetComponent<MeshCollider>().sharedMesh = mesh;
 
