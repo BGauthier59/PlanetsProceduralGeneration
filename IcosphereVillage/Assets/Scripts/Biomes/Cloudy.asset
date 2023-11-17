@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a145b00af5db0d343b1730604b5de1f9, type: 3}
   m_Name: Cloudy
   m_EditorClassIdentifier: 
+  biomeName: CLOUDY
   topColor: {r: 1, g: 1, b: 1, a: 0}
   groundColor: {r: 0.2971698, g: 1, b: 0.5341673, a: 0}
   bottomColor: {r: 0.19428623, g: 0.6981132, b: 0.550949, a: 0}

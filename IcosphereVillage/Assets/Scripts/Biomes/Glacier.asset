@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a145b00af5db0d343b1730604b5de1f9, type: 3}
   m_Name: Glacier
   m_EditorClassIdentifier: 
+  biomeName: GLACIER
   topColor: {r: 0.4862745, g: 0.9607843, b: 0.9490196, a: 0}
   groundColor: {r: 1, g: 1, b: 1, a: 0}
   bottomColor: {r: 0.11764706, g: 0.4509804, b: 1, a: 0}

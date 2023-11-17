@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a145b00af5db0d343b1730604b5de1f9, type: 3}
   m_Name: Crystal
   m_EditorClassIdentifier: 
+  biomeName: CRYSTAL
   topColor: {r: 0.38431373, g: 0.19215687, b: 0.67058825, a: 0}
   groundColor: {r: 0.30588236, g: 0.7176471, b: 0.5882353, a: 0}
   bottomColor: {r: 0.5411765, g: 0, b: 1, a: 0}

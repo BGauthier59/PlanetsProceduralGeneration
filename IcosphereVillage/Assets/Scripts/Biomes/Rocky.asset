@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a145b00af5db0d343b1730604b5de1f9, type: 3}
   m_Name: Rocky
   m_EditorClassIdentifier: 
+  biomeName: ROCKY
   topColor: {r: 0.5019608, g: 0.5019608, b: 0.5019608, a: 0}
   groundColor: {r: 0.34117648, g: 0.34117648, b: 0.34117648, a: 0}
   bottomColor: {r: 0, g: 0, b: 0, a: 0}

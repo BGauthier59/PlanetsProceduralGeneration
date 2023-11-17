@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a145b00af5db0d343b1730604b5de1f9, type: 3}
   m_Name: Desert
   m_EditorClassIdentifier: 
+  biomeName: DESERT
   topColor: {r: 0.6313726, g: 0.27058825, b: 0.21176471, a: 0}
   groundColor: {r: 1, g: 0.72156864, b: 0.10980392, a: 0}
   bottomColor: {r: 0.41568628, g: 0.16862746, b: 0.2627451, a: 0}

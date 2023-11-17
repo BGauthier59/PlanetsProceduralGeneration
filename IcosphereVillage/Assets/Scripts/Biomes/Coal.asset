@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a145b00af5db0d343b1730604b5de1f9, type: 3}
   m_Name: Coal
   m_EditorClassIdentifier: 
+  biomeName: COAL
   topColor: {r: 0, g: 0, b: 0, a: 0}
   groundColor: {r: 0.16037738, g: 0.16037738, b: 0.16037738, a: 0}
   bottomColor: {r: 0.4245283, g: 0.4245283, b: 0.4245283, a: 0}
