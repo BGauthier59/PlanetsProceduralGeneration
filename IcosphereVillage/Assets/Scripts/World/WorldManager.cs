@@ -13,7 +13,7 @@ public class WorldManager : MonoSingleton<WorldManager>
     [SerializeField] private Planet planetPrefab;
     [SerializeField] private Transform origin;
     [SerializeField] private uint globalSeed;
-    [SerializeField] private uint enteredSeed;
+    [SerializeField] private int enteredSeed;
     [SerializeField] private int explorationRadiusStep;
     private int explorationRadius;
     [SerializeField] private float rocketSpeed;
@@ -22,7 +22,7 @@ public class WorldManager : MonoSingleton<WorldManager>
     {
         RandomGenerator.seedGeneratorSeed = (uint)Random.Range(0, int.MaxValue);
 
-        await CreateNewPlanet(GetNewPlanetPositionAndAngle(), RandomGenerator.GetRandomSeed());
+        await CreateNewPlanet(GetNewPlanetPositionAndAngle(), (int)RandomGenerator.GetRandomSeed());
         PlayerController.instance.Initialize(allPlanets[0]);
     }
 
@@ -60,7 +60,7 @@ public class WorldManager : MonoSingleton<WorldManager>
 
         #region CreatePlanet
 
-        Planet newPlanet = await CreateNewPlanet(GetNewPlanetPositionAndAngle(), RandomGenerator.GetRandomSeed());
+        Planet newPlanet = await CreateNewPlanet(GetNewPlanetPositionAndAngle(), (int)RandomGenerator.GetRandomSeed());
 
         #endregion
 
@@ -117,8 +117,10 @@ public class WorldManager : MonoSingleton<WorldManager>
         PlayerController.instance.SetCurrentPlanet(newPlanet);
     }
 
-    public async Task<Planet> CreateNewPlanet((Vector3, float) data, uint seed)
+    public async Task<Planet> CreateNewPlanet((Vector3, float) data, int seed)
     {
+
+        uint realSeed = seed == -1 ? RandomGenerator.GetRandomSeed() : (uint)seed;
         var p = Instantiate(planetPrefab, data.Item1, Quaternion.identity, origin);
 
         p.currentAngle = data.Item2;
@@ -126,7 +128,7 @@ public class WorldManager : MonoSingleton<WorldManager>
         p.orbitSpeed = RandomGenerator.GetRandomValueInRange(0, 0.1f);
         p.orbitSpeed = 0.2f;
 
-        await p.Initialize(seed);
+        await p.Initialize(realSeed);
         allPlanets.Add(p);
         UIManager.instance.AddPlanetGui(allPlanets.Count - 1);
 
@@ -147,10 +149,9 @@ public class WorldManager : MonoSingleton<WorldManager>
 
     private void RotatePlanetsAroundOrigin()
     {
-        return;
         foreach (var planet in allPlanets)
         {
-            //if (planet == PlayerController.instance.GetCurrentPlanet) continue;
+            if (planet == PlayerController.instance.GetCurrentPlanet) continue;
             planet.currentAngle += planet.orbitSpeed * Time.deltaTime;
             planet.transform.position = origin.position +
                                         Vector3.right * (planet.distanceFromOrigin * math.cos(planet.currentAngle)) +
@@ -171,7 +172,7 @@ public class WorldManager : MonoSingleton<WorldManager>
         allPlanets[^1].CreateBuilding(DEBUG_RocketPos, Building.Rocket);
     }
 
-    public void DEBUG_SetSeed(uint s)
+    public void DEBUG_SetSeed(int s)
     {
         enteredSeed = s;
     }

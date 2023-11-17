@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 public class UIManager : MonoSingleton<UIManager>
 {
@@ -18,7 +19,7 @@ public class UIManager : MonoSingleton<UIManager>
     [SerializeField] private Vector3 mousePosMemory;
     [SerializeField] private bool selecting;
     [SerializeField] private string[] syllables;
-    
+
     [SerializeField] private TMP_Text planetNameText;
     [SerializeField] private TMP_Text planetSeedText;
     [SerializeField] private TMP_Text planetNumberText;
@@ -26,7 +27,7 @@ public class UIManager : MonoSingleton<UIManager>
     [SerializeField] private TMP_Text TileDataIndex;
     [SerializeField] private TMP_Text TileDataResources;
     [SerializeField] private Image[] biomeColorImages;
-    
+
     private static readonly int WaterColor = Shader.PropertyToID("_WaterColor");
 
     private void Start()
@@ -55,7 +56,7 @@ public class UIManager : MonoSingleton<UIManager>
         string pname = "";
 
         int x = RandomGenerator.GetRandomValueInt(3, 5);
-        
+
         for (int i = 0; i < x; i++)
         {
             pname += syllables[RandomGenerator.GetRandomValueInt(0, syllables.Length)];
@@ -67,7 +68,7 @@ public class UIManager : MonoSingleton<UIManager>
         pname = upper + pname;
 
         p.planetName = pname;
-        n.Initialize(newPlanetIndex, w, e,pname);
+        n.Initialize(newPlanetIndex, w, e, pname);
         allPlanetGuis.Add(n);
     }
 
@@ -117,6 +118,7 @@ public class UIManager : MonoSingleton<UIManager>
             TileDataResources.text = "";
             return;
         }
+
         TileDataIndex.text = index.ToString();
         TileDataResources.text = resources.ToString();
     }
@@ -127,9 +129,8 @@ public class UIManager : MonoSingleton<UIManager>
         {
             allPlanetGuis[i].UpdateRessourceCount(WorldManager.instance.GetPlanet(i).hangarRessourceAmount);
         }
-        
-        
-        
+
+
         if (!selecting) return;
 
         if (Vector3.Distance(Input.mousePosition, mousePosMemory) < 300)
@@ -182,12 +183,15 @@ public class UIManager : MonoSingleton<UIManager>
 
     public void ModifySeed(string seed)
     {
-        if (uint.TryParse(seed, out uint s))
+        if (int.TryParse(seed, out int s))
         {
-            Debug.Log("Worked.");        
-            WorldManager.instance.DEBUG_SetSeed(s);
+            Debug.Log("Worked.");
         }
-        else Debug.LogWarning("Didn't work.");
-        
+        else
+        {
+            s = -1;
+        }
+
+        WorldManager.instance.DEBUG_SetSeed(s);
     }
 }
