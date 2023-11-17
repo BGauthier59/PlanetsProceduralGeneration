@@ -33,6 +33,8 @@ public class Planet : MonoBehaviour
     public float noiseSize;
     public float forestNoiseSize;
 
+    public string planetName;
+
     public int waterLevel;
 
     public int hangarRessourceAmount;
@@ -951,6 +953,10 @@ public class Planet : MonoBehaviour
         if (triangle == null)
         {
             triangle = triangles[0];
+            triangles[0].heightLevel = waterLevel;
+            triangles[triangles[0].neighbourA].heightLevel = waterLevel;
+            triangles[triangles[0].neighbourB].heightLevel = waterLevel;
+            triangles[triangles[0].neighbourC].heightLevel = waterLevel;
         }
 
         Vector3 pos = GetTriangleCenterPoint(hangarIndex);
@@ -960,8 +966,6 @@ public class Planet : MonoBehaviour
             .transform;
 
         tr.localPosition = pos;
-        
-        hangarTexts.Add(tr.GetChild(0).GetChild(0).GetComponent<TMP_Text>());
     }
 
     void CreateFirstExplorers(int tri)
@@ -1080,7 +1084,7 @@ public class Planet : MonoBehaviour
                3;
     }
 
-    void CreateWaterPlatform(int index)
+    public void CreateWaterPlatform(int index)
     {
         if (triangles[index].heightLevel >= waterLevel) return;
 
@@ -1124,11 +1128,6 @@ public class Planet : MonoBehaviour
             rocketByIndex.Add(index, tr);
         }
 
-        if (building == Building.Hangar)
-        {
-            hangarTexts.Add(tr.GetChild(0).GetChild(0).GetComponent<TMP_Text>());
-        }
-
         if (building == Building.House)
         {
             ExplorerBehaviour explorer = Instantiate(explorerPrefab, Vector3.zero, quaternion.identity).GetComponent<ExplorerBehaviour>();
@@ -1152,6 +1151,7 @@ public class Planet : MonoBehaviour
 
         triangles[index].constructionSign = tr.gameObject;
         triangles[index].constructionText = tr.GetChild(0).GetChild(0).GetComponent<TMP_Text>();
+        tr.GetChild(0).GetComponent<CameraRotator>().planet = (int) seed;
 
         switch (triangles[index].constructingBuilding)
         {

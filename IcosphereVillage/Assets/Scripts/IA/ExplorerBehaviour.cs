@@ -30,7 +30,7 @@ public class ExplorerBehaviour : MonoBehaviour
         transform.parent = home.transform;
         locationIndex = startLocationIndex;
         index = WorldManager.instance.AddExplorer(this);
-        
+
         SetPositionOnTriangle();
 
         Debug.Log("index is " + index);
@@ -273,6 +273,15 @@ public class ExplorerBehaviour : MonoBehaviour
     
     private void Update()
     {
+        if (PlayerController.instance.GetCurrentPlanet == home)
+        {
+            icon.gameObject.SetActive(true);
+        }
+        else
+        {
+            icon.gameObject.SetActive(false);
+        }
+        
         icon.transform.rotation = Quaternion.Euler(0,0,0);
         icon.transform.localScale = Vector3.one *
                                     ((1 * Vector3.Distance(icon.transform.position,

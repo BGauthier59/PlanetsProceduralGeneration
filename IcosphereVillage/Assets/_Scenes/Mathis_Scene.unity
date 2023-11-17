@@ -607,6 +607,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: GUI_Canvas
       objectReference: {fileID: 0}
+    - target: {fileID: 6643398732858003944, guid: da7cbb6e0093e3940a0c69950211551c,
+        type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 1700
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

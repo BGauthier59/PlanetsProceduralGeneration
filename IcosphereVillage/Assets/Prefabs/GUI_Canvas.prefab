@@ -1199,6 +1199,44 @@ MonoBehaviour:
   unselectColor: {r: 0.3962264, g: 0.3962264, b: 0.3962264, a: 0.69411767}
   mousePosMemory: {x: 0, y: 0, z: 0}
   selecting: 0
+  syllables:
+  - 1
+  - 2
+  - vor
+  - min
+  - ga
+  - tu
+  - xio
+  - -X
+  - 3
+  - 4
+  - 5
+  - 6
+  - 7
+  - 8
+  - 9
+  - po
+  - mon
+  - ki
+  - hu
+  - man
+  - '-'
+  - com
+  - sin
+  - se
+  - lu
+  - sa
+  - fro
+  - nin
+  - li
+  - zu
+  - bon
+  - mau
+  - dir
+  - so
+  - mo
+  - dun
+  - lak
 --- !u!1 &7480213666475640050
 GameObject:
   m_ObjectHideFlags: 0

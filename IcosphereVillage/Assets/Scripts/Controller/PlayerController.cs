@@ -18,6 +18,8 @@ public class PlayerController : MonoSingleton<PlayerController>
     public int selectionTriangle;
     public ExplorerBehaviour selectionExplorer;
 
+    public Vector3 mousePosMem;
+
     // Rotation
     private Vector2 mouseMove;
     private bool isDraggingPlanet;
@@ -99,6 +101,24 @@ public class PlayerController : MonoSingleton<PlayerController>
         isHolding = true;
         if (!isSelecting) ClickOnTile();
         else SelectOption();
+    }
+    
+    public void OnRightClick(InputAction.CallbackContext ctx)
+    {
+        if (!IsReadingInput()) return;
+        if (ctx.started) mousePosMem = Input.mousePosition;
+        if (ctx.canceled && Input.mousePosition == mousePosMem)
+        {
+            
+            if (!isSelecting)
+            {
+                if (currentTriangleIndex != -1 && currentPlanet.hangarRessourceAmount > 0)
+                {
+                    currentPlanet.hangarRessourceAmount--;
+                    currentPlanet.CreateWaterPlatform(currentTriangleIndex);
+                }
+            }   
+        }
     }
 
     public void SelectOption()

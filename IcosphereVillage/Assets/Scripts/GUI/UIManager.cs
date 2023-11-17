@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 public class UIManager : MonoSingleton<UIManager>
 {
-    [SerializeField] private PlanetGUI[] allPlanetGuis;
+    [SerializeField] private List<PlanetGUI> allPlanetGuis;
     [SerializeField] private Transform planetGuiLayout;
     [SerializeField] private PlanetGUI planetGuiPrefab;
     [SerializeField] private TMP_Text infoText;
@@ -17,6 +17,7 @@ public class UIManager : MonoSingleton<UIManager>
     [SerializeField] private Color selectionColor,unselectColor;
     [SerializeField] private Vector3 mousePosMemory;
     [SerializeField] private bool selecting;
+    [SerializeField] private string[] syllables;
     
     private static readonly int WaterColor = Shader.PropertyToID("_WaterColor");
 
@@ -43,8 +44,20 @@ public class UIManager : MonoSingleton<UIManager>
 
         w.a = 1;
         e.a = 1;
-        n.Initialize(newPlanetIndex, w, e);
 
+
+        string pname = "";
+
+        int x = RandomGenerator.GetRandomValueInt(3, 5);
+        
+        for (int i = 0; i < x; i++)
+        {
+            pname += syllables[RandomGenerator.GetRandomValueInt(0, syllables.Length)];
+        }
+
+        p.planetName = pname;
+        n.Initialize(newPlanetIndex, w, e,pname);
+        allPlanetGuis.Add(n);
     }
 
     public void SelectExplorerGui(int index)
@@ -73,6 +86,13 @@ public class UIManager : MonoSingleton<UIManager>
 
     public void Update()
     {
+        for (int i = 0; i < allPlanetGuis.Count; i++)
+        {
+            allPlanetGuis[i].UpdateRessourceCount(WorldManager.instance.GetPlanet(i).hangarRessourceAmount);
+        }
+        
+        
+        
         if (!selecting) return;
         
         if (Vector3.Distance(Input.mousePosition, mousePosMemory) < 300)
