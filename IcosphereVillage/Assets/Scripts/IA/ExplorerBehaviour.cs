@@ -84,8 +84,16 @@ public class ExplorerBehaviour : MonoBehaviour
                 { { locationIndex, iterator } }; // Key is triangle index, Value is weight
 
         int calculatingIndex = locationIndex;
-        List<int> currentNeighbours = GetNeighbours(calculatingIndex).ToList();
-        List<int> nextNeighbours = new List<int>();
+        List<int> currentNeighbours = new List<int>();
+        List<int> nextNeighbours = GetNeighbours(calculatingIndex).ToList();
+
+        foreach (var neighbour in nextNeighbours)
+        {
+            if(!IsNeighbourReachable(locationIndex, neighbour)) continue;
+            currentNeighbours.Add(neighbour);
+        }
+        
+        nextNeighbours.Clear();
 
         // We find target
         while (iterator < 2000)
@@ -180,6 +188,8 @@ public class ExplorerBehaviour : MonoBehaviour
     {
         Triangle start = home.triangles[from];
         Triangle end = home.triangles[to];
+        
+        Debug.Log(math.abs(start.heightLevel - end.heightLevel));
 
         if (math.abs(start.heightLevel - end.heightLevel) > 1) return false;
         if (end.heightLevel < home.waterLevel) return false;
