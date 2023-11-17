@@ -81,6 +81,8 @@ MonoBehaviour:
   planetPrefab: {fileID: 3254101452558638239, guid: c15a4d7057260e44199931fe0876fedb,
     type: 3}
   origin: {fileID: 6446619900797888652}
-  globalSeed: 916959637
+  globalSeed: 5
+  enteredSeed: -1
   explorationRadiusStep: 30
+  rocketSpeed: 10
   DEBUG_RocketPos: 0

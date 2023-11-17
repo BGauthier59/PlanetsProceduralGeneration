@@ -61,9 +61,12 @@ public class Planet : MonoBehaviour
     public BiomeSO biome;
 
 
+    public bool rotating;
     public float distanceFromOrigin;
     public float orbitSpeed;
     public float currentAngle;
+    public float amplitude;
+    public float offset;
 
     private void OnValidate()
     {

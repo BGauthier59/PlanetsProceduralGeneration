@@ -183,11 +183,17 @@ public class UIManager : MonoSingleton<UIManager>
 
     public void ModifySeed(string seed)
     {
+        Debug.Log(seed);
         if (int.TryParse(seed, out int s))
         {
             Debug.Log("Worked.");
         }
         else
+        {
+            s = -1;
+        }
+
+        if (seed == null)
         {
             s = -1;
         }
