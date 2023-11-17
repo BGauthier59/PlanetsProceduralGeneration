@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using TMPro;
 using Unity.Mathematics;
-using Unity.VisualScripting.Dependencies.Sqlite;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -95,13 +94,13 @@ public class Planet : MonoBehaviour
         */
     }
 
-    public async Task Initialize()
+    public async Task Initialize(uint seed)
     {
         waterSphere.gameObject.SetActive(false);
         explorer1.gameObject.SetActive(false);
         explorer2.gameObject.SetActive(false);
-        
-        seed = RandomGenerator.GetRandomSeed();
+
+        this.seed = seed;
 
         elevationNoise = new Noise((int)seed);
         densityNoise = new Noise((int)seed + 1);

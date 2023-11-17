@@ -13,15 +13,16 @@ public class WorldManager : MonoSingleton<WorldManager>
     [SerializeField] private Planet planetPrefab;
     [SerializeField] private Transform origin;
     [SerializeField] private uint globalSeed;
+    [SerializeField] private uint enteredSeed;
     [SerializeField] private int explorationRadiusStep;
     private int explorationRadius;
     [SerializeField] private float rocketSpeed;
 
     private async void Start()
     {
-        RandomGenerator.seedGeneratorSeed = globalSeed;
+        RandomGenerator.seedGeneratorSeed = (uint)Random.Range(0, int.MaxValue);
 
-        await CreateNewPlanet(GetNewPlanetPositionAndAngle());
+        await CreateNewPlanet(GetNewPlanetPositionAndAngle(), RandomGenerator.GetRandomSeed());
         PlayerController.instance.Initialize(allPlanets[0]);
     }
 
@@ -59,7 +60,7 @@ public class WorldManager : MonoSingleton<WorldManager>
 
         #region CreatePlanet
 
-        Planet newPlanet = await CreateNewPlanet(GetNewPlanetPositionAndAngle());
+        Planet newPlanet = await CreateNewPlanet(GetNewPlanetPositionAndAngle(), RandomGenerator.GetRandomSeed());
 
         #endregion
 
@@ -116,7 +117,7 @@ public class WorldManager : MonoSingleton<WorldManager>
         PlayerController.instance.SetCurrentPlanet(newPlanet);
     }
 
-    public async Task<Planet> CreateNewPlanet((Vector3, float) data)
+    public async Task<Planet> CreateNewPlanet((Vector3, float) data, uint seed)
     {
         var p = Instantiate(planetPrefab, data.Item1, Quaternion.identity, origin);
 
@@ -125,7 +126,7 @@ public class WorldManager : MonoSingleton<WorldManager>
         p.orbitSpeed = RandomGenerator.GetRandomValueInRange(0, 0.1f);
         p.orbitSpeed = 0.2f;
 
-        await p.Initialize();
+        await p.Initialize(seed);
         allPlanets.Add(p);
         UIManager.instance.AddPlanetGui(allPlanets.Count - 1);
 
@@ -160,7 +161,7 @@ public class WorldManager : MonoSingleton<WorldManager>
     public void DEBUG_CreatePlanet()
     {
         var rng = GetNewPlanetPositionAndAngle();
-        CreateNewPlanet(rng);
+        CreateNewPlanet(rng, enteredSeed);
     }
 
     public int DEBUG_RocketPos;
@@ -168,5 +169,10 @@ public class WorldManager : MonoSingleton<WorldManager>
     public void DEBUG_CreateRocket()
     {
         allPlanets[^1].CreateBuilding(DEBUG_RocketPos, Building.Rocket);
+    }
+
+    public void DEBUG_SetSeed(uint s)
+    {
+        enteredSeed = s;
     }
 }

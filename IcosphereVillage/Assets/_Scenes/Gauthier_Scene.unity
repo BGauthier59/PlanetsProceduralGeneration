@@ -800,6 +800,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8030919568545867081, guid: bcaa896990cde654abcbd45a94d58b17,
         type: 3}
+      propertyPath: globalSeed
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8030919568545867081, guid: bcaa896990cde654abcbd45a94d58b17,
+        type: 3}
       propertyPath: rocketSpeed
       value: 10
       objectReference: {fileID: 0}

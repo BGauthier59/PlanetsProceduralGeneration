@@ -26,7 +26,7 @@ public class UIManager : MonoSingleton<UIManager>
     [SerializeField] private TMP_Text TileDataIndex;
     [SerializeField] private TMP_Text TileDataResources;
     [SerializeField] private Image[] biomeColorImages;
-
+    
     private static readonly int WaterColor = Shader.PropertyToID("_WaterColor");
 
     private void Start()
@@ -178,5 +178,16 @@ public class UIManager : MonoSingleton<UIManager>
                 choices[i].color = Color.Lerp(choices[i].color, unselectColor, 5 * Time.deltaTime);
             }
         }
+    }
+
+    public void ModifySeed(string seed)
+    {
+        if (uint.TryParse(seed, out uint s))
+        {
+            Debug.Log("Worked.");        
+            WorldManager.instance.DEBUG_SetSeed(s);
+        }
+        else Debug.LogWarning("Didn't work.");
+        
     }
 }
