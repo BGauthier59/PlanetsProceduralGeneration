@@ -15,6 +15,7 @@ public class BiomeSO : ScriptableObject
     [SerializeField] public RessourceType[] ressources;
 
     public GameObject waterPlatform;
+    public int platformFrequency;
 }
 
 [Serializable]

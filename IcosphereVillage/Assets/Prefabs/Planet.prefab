@@ -293,6 +293,9 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 1074c042f6bd0f4468a644f11e8e83ea, type: 2}
   - {fileID: 11400000, guid: 6a3dc63e50ad7524fb2a2dd75a90c0f5, type: 2}
   - {fileID: 11400000, guid: edfb5f4a68ef3bd4d9e3a0a9fd53a9a4, type: 2}
+  - {fileID: 11400000, guid: 28009489f08d8c6408aac513dea5da1a, type: 2}
+  - {fileID: 11400000, guid: ecc6a4281a1159447b8253428dfaaece, type: 2}
+  - {fileID: 11400000, guid: e42f6628d78245f4f81df308f163b5e6, type: 2}
   biome: {fileID: 0}
   distanceFromOrigin: 0
   orbitSpeed: 0

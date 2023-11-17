@@ -252,7 +252,7 @@ public class PlayerController : MonoSingleton<PlayerController>
         cursorFilter.mesh = null;
 
         Vector3 v1, v2, v3;
-        if (currentTriangle.heightLevel == 0)
+        if (currentTriangle.heightLevel == 0 || currentTriangle.building == Building.Bridge)
         {
             v1 = currentPlanet.transform.TransformPoint(currentPlanet.vertices[currentTriangle.indices[0]]);
             v2 = currentPlanet.transform.TransformPoint(currentPlanet.vertices[currentTriangle.indices[1]]);

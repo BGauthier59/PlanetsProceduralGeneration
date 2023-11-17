@@ -117,7 +117,7 @@ public class Planet : MonoBehaviour
         }
 
         // MAX HEIGHT DE 2 A 5
-        maxHeight = RandomGenerator.GetRandomValueInt(2, 6);
+        maxHeight = RandomGenerator.GetRandomValueInt(2, 7);
 
         // WATER LEVEL DE 0 ( pas d'eau ) A MAX HEIGHT - 1 ( 2 niveaux de ground minimum )
         waterLevel = RandomGenerator.GetRandomValueInt(0, maxHeight);
@@ -273,6 +273,14 @@ public class Planet : MonoBehaviour
         filter.mesh = mesh;
 
         GetComponent<MeshCollider>().sharedMesh = mesh;
+
+        for (int i = 0; i < triangles.Count; i++)
+        {
+            if (triangles[i].heightLevel < waterLevel)
+            {
+                if(RandomGenerator.GetRandomValueInt(0,biome.platformFrequency+1) == 0) CreateWaterPlatform(i);
+            }
+        }
     }
 
     #region Elevation

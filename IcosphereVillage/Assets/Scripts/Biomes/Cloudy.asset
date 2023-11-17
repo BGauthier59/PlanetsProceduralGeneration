@@ -10,25 +10,24 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a145b00af5db0d343b1730604b5de1f9, type: 3}
-  m_Name: Taiga
+  m_Name: Cloudy
   m_EditorClassIdentifier: 
-  topColor: {r: 0.6117647, g: 0.35686275, b: 0.20392157, a: 0}
-  groundColor: {r: 0.003921569, g: 0.7647059, b: 0.10980392, a: 0}
-  bottomColor: {r: 0.3882353, g: 0.10980392, b: 0.08235294, a: 0}
+  topColor: {r: 1, g: 1, b: 1, a: 0}
+  groundColor: {r: 0.2971698, g: 1, b: 0.5341673, a: 0}
+  bottomColor: {r: 0.19428623, g: 0.6981132, b: 0.550949, a: 0}
   waterMaterials:
   - {fileID: 2100000, guid: 6d4eaef20b799a9469e3d8bae1e57049, type: 2}
   - {fileID: 2100000, guid: c145928709a1a9e43a4f30bd7975df85, type: 2}
-  - {fileID: 2100000, guid: c4614291955ed21449dea0b421b68769, type: 2}
-  - {fileID: 2100000, guid: 3db461285d45f4742a836073b68d2559, type: 2}
-  - {fileID: 2100000, guid: 12f3167f5b0012c44a770e041d142310, type: 2}
-  - {fileID: 2100000, guid: 474a49f54a2c09340871ea8de761ee41, type: 2}
   - {fileID: 2100000, guid: 18893de600d4ccc4791c1b864ee6be45, type: 2}
+  - {fileID: 2100000, guid: c4614291955ed21449dea0b421b68769, type: 2}
+  - {fileID: 2100000, guid: 12f3167f5b0012c44a770e041d142310, type: 2}
+  - {fileID: 2100000, guid: 3db461285d45f4742a836073b68d2559, type: 2}
   ressources:
   - prefab: {fileID: 603484951750611027, guid: 9b83d9d41403c8148adae34efb9bb9da, type: 3}
     colorGradient:
       serializedVersion: 2
-      key0: {r: 0.5067395, g: 0.7735849, b: 0.28097185, a: 1}
-      key1: {r: 1, g: 0.6664248, b: 0.07075471, a: 1}
+      key0: {r: 0.31682143, g: 0.5849056, b: 0.15726236, a: 1}
+      key1: {r: 0.3999997, g: 0.9980923, b: 0.5190388, a: 1}
       key2: {r: 0, g: 0, b: 0, a: 0}
       key3: {r: 0, g: 0, b: 0, a: 0}
       key4: {r: 0, g: 0, b: 0, a: 0}
@@ -56,11 +55,12 @@ MonoBehaviour:
       m_NumColorKeys: 2
       m_NumAlphaKeys: 2
     materialIndex: 0
-  - prefab: {fileID: 603484951750611027, guid: 9b83d9d41403c8148adae34efb9bb9da, type: 3}
+  - prefab: {fileID: 4908968899173395347, guid: a291d3cfc3048864fb06ad4b64690195,
+      type: 3}
     colorGradient:
       serializedVersion: 2
-      key0: {r: 0.9811321, g: 0.5494641, b: 0.14346743, a: 1}
-      key1: {r: 0.77254903, g: 0.122461535, b: 0, a: 1}
+      key0: {r: 0.5801887, g: 1, b: 0.68134767, a: 1}
+      key1: {r: 0.35622635, g: 0.8773585, b: 0.12829298, a: 1}
       key2: {r: 0, g: 0, b: 0, a: 0}
       key3: {r: 0, g: 0, b: 0, a: 0}
       key4: {r: 0, g: 0, b: 0, a: 0}
@@ -92,8 +92,8 @@ MonoBehaviour:
       type: 3}
     colorGradient:
       serializedVersion: 2
-      key0: {r: 0.8867924, g: 0.1916859, b: 0.17150229, a: 1}
-      key1: {r: 1, g: 0.6023743, b: 0.3443396, a: 1}
+      key0: {r: 0.9607843, g: 0.6000099, b: 0.4862745, a: 1}
+      key1: {r: 0.8584906, g: 0, b: 0.07896231, a: 1}
       key2: {r: 0, g: 0, b: 0, a: 0}
       key3: {r: 0, g: 0, b: 0, a: 0}
       key4: {r: 0, g: 0, b: 0, a: 0}
@@ -121,6 +121,6 @@ MonoBehaviour:
       m_NumColorKeys: 2
       m_NumAlphaKeys: 2
     materialIndex: 2
-  waterPlatform: {fileID: 7479928330648698801, guid: 3ec6b2adc55ee6b4d88c91964f3574c1,
+  waterPlatform: {fileID: 6154231884391215448, guid: 604fd768f0c001649b74d234a10f4b1d,
     type: 3}
-  platformFrequency: 20
+  platformFrequency: 15

@@ -123,3 +123,4 @@ MonoBehaviour:
     materialIndex: 0
   waterPlatform: {fileID: 2221128290191577883, guid: 27876e934e99d3042a7f81d792517421,
     type: 3}
+  platformFrequency: 50
