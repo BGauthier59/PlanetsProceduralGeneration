@@ -19,7 +19,6 @@ public class UIManager : MonoSingleton<UIManager>
     [SerializeField] private bool selecting;
     [SerializeField] private string[] syllables;
     
-
     [SerializeField] private TMP_Text planetNameText;
     [SerializeField] private TMP_Text planetSeedText;
     [SerializeField] private TMP_Text planetNumberText;
@@ -61,6 +60,11 @@ public class UIManager : MonoSingleton<UIManager>
         {
             pname += syllables[RandomGenerator.GetRandomValueInt(0, syllables.Length)];
         }
+
+        string upper = pname[0].ToString();
+        upper = upper.ToUpper();
+        pname = pname.Remove(0, 1);
+        pname = upper + pname;
 
         p.planetName = pname;
         n.Initialize(newPlanetIndex, w, e,pname);

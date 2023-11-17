@@ -63,7 +63,7 @@ public class PlayerController : MonoSingleton<PlayerController>
         currentPlanet = p;
         minMaxDistanceSub = p.subdivisions == 2 ? minMaxDistanceSub0 : minMaxDistanceSub1;
         SetDistance(0);
-        UIManager.instance.RefreshPlanetInfoGui("WIP", p.biome.biomeName, p.biome.groundColor, currentPlanetIndex + 1, (int)p.seed);
+        UIManager.instance.RefreshPlanetInfoGui(p.planetName, p.biome.biomeName, p.biome.groundColor, currentPlanetIndex + 1, (int)p.seed);
     }
 
     public Planet GetCurrentPlanet => currentPlanet;
