@@ -847,21 +847,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 8030919568545867081, guid: bcaa896990cde654abcbd45a94d58b17,
-        type: 3}
-      propertyPath: globalSeed
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 8030919568545867081, guid: bcaa896990cde654abcbd45a94d58b17,
-        type: 3}
-      propertyPath: enteredSeed
-      value: -1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8030919568545867081, guid: bcaa896990cde654abcbd45a94d58b17,
-        type: 3}
-      propertyPath: rocketSpeed
-      value: 10
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
